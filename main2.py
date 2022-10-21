@@ -12,6 +12,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__(parent=None)
         self.button_map = []
+        self.checkedPlace = None
 
         self.setCentralWidget(QWidget())
         self.dock = QDockWidget("Menu")
@@ -19,11 +20,17 @@ class MainWindow(QMainWindow):
         scroll = QScrollArea()
         self.dock.setWidget(scroll)
 
-        self.text = QLabel("Text")
+        self.text = QLabel("Value= ")
         self.text.setDisabled(True)
+        self.value = QLabel("")
+        self.value.setDisabled(True)
+        self.deleteBtn = QPushButton("Delete place", self)
+        self.deleteBtn.clicked.connect(lambda: self.deletePlace(self.checkedPlace))
         wid = QWidget()
         lay = QVBoxLayout(wid)
         lay.addWidget(self.text)
+        lay.addWidget(self.value)
+        lay.addWidget(self.deleteBtn)
         self.dock.setWidget(wid)
         self.dock.setVisible(False)
 
@@ -36,6 +43,7 @@ class MainWindow(QMainWindow):
         self.addPlaceBtn = QPushButton("add place", self)
         self.addPlaceBtn.move(5, 5)
         self.addPlaceBtn.setCheckable(True)
+        # self.addPlaceBtn.dragMoveEvent(True)
 
         # self.addTransitionBtn = QPushButton("add transition", self)
         # self.addTransitionBtn.move(100, 5)
@@ -46,14 +54,15 @@ class MainWindow(QMainWindow):
         self.changeLabelBtn.move(195, 5)
         self.changeLabelBtn.clicked.connect(self.change)
 
-
-
-
+    def deletePlace(self, place):
+        place.hide()
 
     def change(self):
         for place in self.button_map:
             if place.isChecked():
-                place.setText(str(int(place.text())+1))
+                value = str(int(place.text())+1)
+                place.setText(value)
+                self.value.setText(value)
 
     def changeColorIfChecked(self, name):
         for place in self.button_map:
@@ -62,7 +71,8 @@ class MainWindow(QMainWindow):
                 place.setChecked(False)
 
         if name.isChecked():
-            self.text.setText(str(name))
+            self.checkedPlace = name
+            self.value.setText(str(name.text()))
             self.dock.setVisible(True)
             name.setStyleSheet("border: 3px solid darkblue; border-radius: 25px")
         else:
@@ -98,6 +108,9 @@ class MainWindow(QMainWindow):
         #     newPlace.setStyleSheet("border: 3px solid dodgerblue;")
         #     newPlace.setCheckable(True)
         #     newPlace.show()
+
+    # def mouseMoveEvent(self, QMouseEvent):
+        # print(QMouseEvent.pos().x(), QMouseEvent.pos().y())
 
 if __name__ == "__main__":
     app = QApplication([])
