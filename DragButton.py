@@ -1,25 +1,5 @@
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import QPushButton, QApplication, QWidget, QMainWindow
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super(MainWindow, self).__init__(parent=None)
-
-        b = DragButton("Drag", self)
-        b.move(50, 50)
-        b.clicked.connect(clicked)
-        b.show()
-
-
-
-
-        self.setWindowTitle("PetriPy")
-        self.resize(600, 600)
-
-        self.addPlaceBtn = QPushButton("add place", self)
-        self.addPlaceBtn.move(5, 5)
-        self.addPlaceBtn.setCheckable(True)
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QPushButton
 
 
 class DragButton(QPushButton):
@@ -27,14 +7,14 @@ class DragButton(QPushButton):
     def mousePressEvent(self, event):
         self.__mousePressPos = None
         self.__mouseMovePos = None
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton:
             self.__mousePressPos = event.globalPos()
             self.__mouseMovePos = event.globalPos()
 
         super(DragButton, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        if event.buttons() == QtCore.Qt.LeftButton:
+        if event.buttons() == Qt.MouseButton.LeftButton:
             # adjust offset from clicked point to origin of widget
             currPos = self.mapToGlobal(self.pos())
             globalPos = event.globalPos()
@@ -54,15 +34,3 @@ class DragButton(QPushButton):
                 return
 
         super(DragButton, self).mouseReleaseEvent(event)
-
-def clicked():
-    print("click as normal!")
-
-if __name__ == "__main__":
-    app = QApplication([])
-    # w = QWidget()
-    w = MainWindow()
-
-
-    w.show()
-    app.exec_()

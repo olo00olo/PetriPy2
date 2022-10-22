@@ -1,11 +1,11 @@
-# coffee counter = 2
-# hours spend = about 5
+# coffee counter = 3
+# hours spend = about 8
+from DragButton import DragButton
 import sys
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QApplication, QPushButton, QMenu, QDockWidget, QMainWindow, QWidget, QScrollArea, QLabel, \
-    QVBoxLayout, QTextEdit
-from PyQt6.uic.properties import QtCore
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QPushButton, QMenu, QDockWidget, QMainWindow, QWidget, QScrollArea, QLabel, \
+    QVBoxLayout
 
 
 class MainWindow(QMainWindow):
@@ -13,6 +13,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__(parent=None)
         self.button_map = []
         self.checkedPlace = None
+        # print(self.windowFlags())
 
         self.setCentralWidget(QWidget())
         self.dock = QDockWidget("Menu")
@@ -25,16 +26,20 @@ class MainWindow(QMainWindow):
         self.value = QLabel("")
         self.value.setDisabled(True)
         self.deleteBtn = QPushButton("Delete place", self)
-        self.deleteBtn.clicked.connect(lambda: self.deletePlace(self.checkedPlace))
+        self.deleteBtn.clicked.connect(lambda: self.checkedPlace.hide())
+        self.addValue = QPushButton("+1", self)
+        self.addValue.clicked.connect(lambda: self.change("+"))
+        self.subValue = QPushButton("-1", self)
+        self.subValue.clicked.connect(lambda: self.change("-"))
         wid = QWidget()
         lay = QVBoxLayout(wid)
         lay.addWidget(self.text)
         lay.addWidget(self.value)
+        lay.addWidget(self.addValue)
+        lay.addWidget(self.subValue)
         lay.addWidget(self.deleteBtn)
         self.dock.setWidget(wid)
         self.dock.setVisible(False)
-
-
 
 
         self.setWindowTitle("PetriPy")
@@ -48,21 +53,26 @@ class MainWindow(QMainWindow):
         # self.addTransitionBtn = QPushButton("add transition", self)
         # self.addTransitionBtn.move(100, 5)
         # self.addTransitionBtn.setCheckable(True)
+        #
+        #
+        # self.changeLabelBtn = QPushButton("+1", self)
+        # self.changeLabelBtn.move(195, 5)
+        # self.changeLabelBtn.clicked.connect(self.change)
 
 
-        self.changeLabelBtn = QPushButton("+1", self)
-        self.changeLabelBtn.move(195, 5)
-        self.changeLabelBtn.clicked.connect(self.change)
+    def change(self, symbol):
+        initValue = int(self.checkedPlace.text())
+        if symbol == "+":
+            value = str(initValue+1)
+        elif symbol == "-":
+            if initValue > 0:
+                value = str(initValue-1)
+            else:
+                value = str(0)
 
-    def deletePlace(self, place):
-        place.hide()
+        self.checkedPlace.setText(value)
+        self.value.setText(value)
 
-    def change(self):
-        for place in self.button_map:
-            if place.isChecked():
-                value = str(int(place.text())+1)
-                place.setText(value)
-                self.value.setText(value)
 
     def changeColorIfChecked(self, name):
         for place in self.button_map:
@@ -92,7 +102,8 @@ class MainWindow(QMainWindow):
 
 
         if self.addPlaceBtn.isChecked() and QMouseEvent.button() == Qt.MouseButton.LeftButton:
-            newPlace = QPushButton("0", self)
+            # newPlace = QPushButton("0", self)
+            newPlace = DragButton("0", self)
             newPlace.setGeometry(QMouseEvent.pos().x() - 25, QMouseEvent.pos().y() - 25, 50, 50)
             newPlace.setStyleSheet("border: 3px solid dodgerblue; border-radius: 25px")
             newPlace.setCheckable(True)
@@ -102,6 +113,9 @@ class MainWindow(QMainWindow):
             self.button_map.append(newPlace)
             # print(self.button_map)
 
+        # if self.checkedPlace is not None:
+        #     self.checkedPlace.move(10, 10)
+
         # if self.addTransitionBtn.isChecked():
         #     newPlace = QPushButton("0", self)
         #     newPlace.setGeometry(QMouseEvent.pos().x() - 25, QMouseEvent.pos().y() - 25, 50, 50)
@@ -110,7 +124,7 @@ class MainWindow(QMainWindow):
         #     newPlace.show()
 
     # def mouseMoveEvent(self, QMouseEvent):
-        # print(QMouseEvent.pos().x(), QMouseEvent.pos().y())
+    #     print(QMouseEvent.self.addPlaceButton)
 
 if __name__ == "__main__":
     app = QApplication([])
