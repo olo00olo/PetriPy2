@@ -1,11 +1,15 @@
 # coffee counter = 3
-# hours spend = about 8
-from DragButton import DragButton
+# redbull counter = 2
+# hours spend = about 10
+
 import sys
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QPushButton, QMenu, QDockWidget, QMainWindow, QWidget, QScrollArea, QLabel, \
     QVBoxLayout
+
+from Arcs import ViewPort
+from DragButton import DragButton
 
 
 class MainWindow(QMainWindow):
@@ -41,6 +45,8 @@ class MainWindow(QMainWindow):
         self.dock.setWidget(wid)
         self.dock.setVisible(False)
 
+        view = ViewPort(self)
+        self.setCentralWidget(view)
 
         self.setWindowTitle("PetriPy")
         self.resize(600, 600)
@@ -59,20 +65,18 @@ class MainWindow(QMainWindow):
         # self.changeLabelBtn.move(195, 5)
         # self.changeLabelBtn.clicked.connect(self.change)
 
-
     def change(self, symbol):
         initValue = int(self.checkedPlace.text())
         if symbol == "+":
-            value = str(initValue+1)
+            value = str(initValue + 1)
         elif symbol == "-":
             if initValue > 0:
-                value = str(initValue-1)
+                value = str(initValue - 1)
             else:
                 value = str(0)
 
         self.checkedPlace.setText(value)
         self.value.setText(value)
-
 
     def changeColorIfChecked(self, name):
         for place in self.button_map:
@@ -95,11 +99,9 @@ class MainWindow(QMainWindow):
         delete = contextMenu.addAction("Delete")
         action = contextMenu.exec(self.mapToGlobal(event.pos()))
 
-
     def mousePressEvent(self, QMouseEvent):
         if QMouseEvent.button() == Qt.MouseButton.RightButton:
             print(QMouseEvent.pos().x(), QMouseEvent.pos().y())
-
 
         if self.addPlaceBtn.isChecked() and QMouseEvent.button() == Qt.MouseButton.LeftButton:
             # newPlace = QPushButton("0", self)
@@ -126,8 +128,13 @@ class MainWindow(QMainWindow):
     # def mouseMoveEvent(self, QMouseEvent):
     #     print(QMouseEvent.self.addPlaceButton)
 
+
 if __name__ == "__main__":
     app = QApplication([])
     window = MainWindow()
+
+    # view = ViewPort(window)
+    # window.setCentralWidget(view)
+
     window.show()
     sys.exit(app.exec())
