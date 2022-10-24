@@ -9,12 +9,12 @@ from PyQt5.QtWidgets import QGraphicsPathItem
 class Path(QGraphicsPathItem):
     def __init__(self, source: QtCore.QPointF = None, destination: QtCore.QPointF = None, *args, **kwargs):
         super(Path, self).__init__(*args, **kwargs)
-
         self._sourcePoint = source
         self._destinationPoint = destination
 
         self._arrow_height = 5
         self._arrow_width = 4
+        print("arcs")
 
     def setSource(self, point: QtCore.QPointF):
         self._sourcePoint = point
@@ -96,8 +96,6 @@ class ViewPort(QtWidgets.QGraphicsView):
 
     def mousePressEvent(self, event: QtGui.QMouseEvent) -> None:
         print("XD")
-        scene = QtWidgets.QGraphicsScene()
-        self.setScene(scene)
         if event.button() == QtCore.Qt.LeftButton:
             if self.firstClick:
                 self.source = self.mapToScene(event.pos())
@@ -106,7 +104,7 @@ class ViewPort(QtWidgets.QGraphicsView):
                 self.destination = self.mapToScene(event.pos())
                 self._current_path = Path(source=self.source, destination=self.destination)
                 self._isdrawingPath = True
-                scene.addItem(self._current_path)
+                self.addItem(self._current_path)
                 print(self.source, self.destination)
                 self.firstClick = True
             return
@@ -118,6 +116,8 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
 
     window = ViewPort()
+    scene = QtWidgets.QGraphicsScene()
+    window.setScene(scene)
     window.show()
 
     sys.exit(app.exec())
