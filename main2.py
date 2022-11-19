@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import QApplication, QPushButton, QDockWidget, QMainWindow,
 # from Arcs import ViewPort
 from Arcs import Path
 from DragButton import DragButton
-from test import MyLine
 
 class MainWindow(QMainWindow):
     def __init__(self):
