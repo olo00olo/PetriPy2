@@ -2,7 +2,7 @@ import math
 
 from PyQt5.QtCore import (QLineF, QPointF, QRectF, QSizeF, Qt)
 from PyQt5.QtGui import (QBrush, QColor, QPainter,
-                         QPainterPath, QPen, QPolygonF, QRadialGradient)
+                         QPainterPath, QPen, QPolygonF, QRadialGradient, QFont)
 from PyQt5.QtWidgets import (QApplication, QGraphicsItem, QGraphicsScene,
                              QGraphicsView, QStyle, QPushButton, QGraphicsSimpleTextItem, QGraphicsTextItem)
 
@@ -124,11 +124,17 @@ class Node(QGraphicsItem):
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         self.setZValue(1)
 
+#TODO: scaling and moving
+        f = QFont()
+        f.setPointSize(4)
+
         self.tokens = QGraphicsTextItem("0", self)
         self.tokens.setPos(-7, -11)
+        self.tokens.setFont(f)
 
         self.label = QGraphicsTextItem("P1", self)
         self.label.setPos(-20, -25)
+        self.label.setFont(f)
 
     def type(self):
         return Node.Type
@@ -165,7 +171,6 @@ class Node(QGraphicsItem):
             gradient.setCenter(3, 3)
             gradient.setFocalPoint(3, 3)
             gradient.setColorAt(0, QColor(Qt.darkYellow).lighter(120))
-            print("XD")
         else:
             gradient.setColorAt(0, Qt.yellow)
 
@@ -188,6 +193,19 @@ class Node(QGraphicsItem):
     def mouseReleaseEvent(self, event):
         self.update()
         super(Node, self).mouseReleaseEvent(event)
+
+class Place(Node):
+    Type = QGraphicsItem.UserType + 1
+
+    def __init__(self, graphWidget):
+        super(Node, self).__init__()
+
+        self.graph = graphWidget
+        self.edgeList = []
+        self.newPos = QPointF()
+
+
+
 
 class GraphWidget(QGraphicsView):
     def __init__(self):
@@ -220,6 +238,11 @@ class GraphWidget(QGraphicsView):
         node7 = Node(self)
         node8 = Node(self)
         node9 = Node(self)
+
+        node100 = Place(self)
+        self.scene.addItem(node100)
+        node100.setPos(200, 200)
+
         self.scene.addItem(node1)
         self.scene.addItem(node2)
         self.scene.addItem(node3)
@@ -301,11 +324,7 @@ class GraphWidget(QGraphicsView):
             event.accept()
 
         elif event.button() == Qt.MouseButton.MiddleButton:
-            print("1", self.pos())
             self.centerOn(event.pos())
-            print("mouse", event.pos())
-            print("2", self.pos())
-
 
     def mouseMoveEvent(self, event):
         items = self.items(event.pos())
