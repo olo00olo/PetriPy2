@@ -1,3 +1,4 @@
+import itertools
 import math
 
 from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QSizeF
@@ -10,9 +11,12 @@ class Edge(QGraphicsItem):
     TwoPi = 2.0 * Pi
 
     Type = QGraphicsItem.UserType + 2
+    newid = itertools.count(1)
 
     def __init__(self, sourceNode, destNode):
         super(Edge, self).__init__()
+
+        self.id = next(self.newid)
 
         self.arrowSize = 10.0
         self.sourcePoint = QPointF()
@@ -42,13 +46,38 @@ class Edge(QGraphicsItem):
         self.dest = node
         self.adjust()
 
+    def findNearest(self):
+        lenList = []
+        lineList = []
+
+        l = [QPointF(-3.5, 0), QPointF(3.5, 0), QPointF(0, -3.5), QPointF(0, 3.5)]
+
+        for e in l:
+            for i in l:
+                line = QLineF(self.mapFromItem(self.source, e),
+                                      self.mapFromItem(self.dest, i))
+                lenList.append(line.length())
+                lineList.append(line)
+
+        m = min(lenList)
+        for e in lineList:
+            if m == e.length():
+                return e
+
+
+
     def adjust(self):
         if not self.source or not self.dest:
             return
 
+        # self.findNearest()
+        # line = self.findNearest()
+        #
         line = QLineF(self.mapFromItem(self.source, 0, 0),
                       self.mapFromItem(self.dest, 0, 0))
         length = line.length()
+
+
 
         self.prepareGeometryChange()
 
@@ -58,6 +87,7 @@ class Edge(QGraphicsItem):
 
             self.sourcePoint = line.p1() + edgeOffset
             self.destPoint = line.p2() - edgeOffset
+
         else:
             self.sourcePoint = line.p1()
             self.destPoint = line.p1()
@@ -73,6 +103,7 @@ class Edge(QGraphicsItem):
                       QSizeF(self.destPoint.x() - self.sourcePoint.x(),
                              self.destPoint.y() - self.sourcePoint.y())).normalized().adjusted(-extra, -extra, extra,
                                                                                                extra)
+
 
     def paint(self, painter, option, widget):
         if not self.source or not self.dest:

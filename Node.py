@@ -20,10 +20,12 @@ class Node(QGraphicsItem):
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         self.setZValue(1)
 
+        # self.active = False
+        self.inArcs = []
+        self.outArcs = []
+
     # TODO: scaling and moving
-    def labels(self):
-        self.label = QGraphicsTextItem("P1", self)
-        self.label.setPos(-20, -25)
+
 
     def token(self):
         self.tokens = QGraphicsTextItem("0", self)

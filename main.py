@@ -52,13 +52,20 @@ class GraphWidget(QGraphicsView):
 
         self.n = NewArc()
 
+        self.placesDict = {}
+        self.transitionsDict = {}
+        self.arcsDict = {}
+
         self.places = []
         self.transitions = []
         self.arcs = []
         self.activeState = None
+        self.activeElements = []
+
 
     def setActiveButton(self):
         self.n.reset()
+        # self.deactivateAllElements()
         if self.sender() is self.addPlaceBtn and self.addPlaceBtn.isChecked():
             self.addTransitionBtn.setChecked(False)
             self.addArcButton.setChecked(False)
@@ -77,46 +84,75 @@ class GraphWidget(QGraphicsView):
             self.addArcButton.setChecked(False)
             self.activeState = 0
 
+    # def deactivateAllElements(self):
+    #     print(self.activeElements, "XD")
+    #     # self.activeElements[0].active = False
+    #     for element in self.activeElements:
+    #         print(element.active)
+    #         element.active = False
+    #         # self.activeElements.remove(element)
+
     def keyPressEvent(self, event):
+        print("XD")
+        for element in self.activeElements:
+            print(element)
+            element.active = False
+            element.setActivated(False)
         key = event.key()
-        print(key)
+
 
     def mousePressEvent(self, event):
         items = self.items(event.pos())
 
         if event.button() == Qt.MouseButton.LeftButton:
-            print(items)
             #default state
             if self.activeState == 0:
                 for item in items:
                     if isinstance(item, (Transition, Place)) and item.active is False:
                         item.active = True
+                        print(item)
+                        self.activeElements.append(item)
+                        print(self.activeElements)
                     elif isinstance(item, (Transition, Place)) and item.active is True:
                         item.active = False
+                        # self.activeElements.remove(item)
+
+
+
             #add place
             if self.activeState == 1:
                 newPlace = Place(self)
                 newPlace.setPos(self.mapToScene(event.pos()))
                 self.scene.addItem(newPlace)
+                self.places.append(newPlace)
+                self.placesDict.update({newPlace.id: newPlace})
+
 
             #add transition
             if self.activeState == 2:
                 newTransition = Transition(self)
                 newTransition.setPos(self.mapToScene(event.pos()))
                 self.scene.addItem(newTransition)
+                self.transitions.append(newTransition)
+                self.transitionsDict.update({newTransition.id: newTransition})
+
 
             #add arc
             if self.activeState == 3:
                 source, destination, error = self.n.setNode(items)
                 if error is False:
-                    print(source, destination)
                     if destination is not None:
-                        self.scene.addItem(Edge(source, destination))
+                        ne = Edge(source, destination)
+                        self.scene.addItem(ne)
                         newArc = []
-                        newArc.append(self.n.source)
-                        newArc.append(self.n.destination)
+                        newArc.append({self.n.source.id: self.n.source})
+                        newArc.append({self.n.destination.id: self.n.destination})
+                        self.n.source.outArcs.append(newArc)
+                        self.n.destination.inArcs.append(newArc)
                         self.arcs.append(newArc)
                         self.n.reset()
+                        self.arcsDict.update({ne.id: newArc})
+                        print(self.arcsDict)
                 else:
                     self.n.reset()
                     msgBox = QMessageBox()
