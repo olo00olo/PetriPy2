@@ -1,10 +1,13 @@
 import math
 
-from PyQt5.QtCore import (QRectF, Qt, QPoint)
+from PyQt5.QtCore import (QRectF, Qt, QPoint, pyqtSignal, pyqtSlot)
 from PyQt5.QtGui import (QPainter)
 from PyQt5.QtWidgets import (QApplication, QGraphicsItem, QGraphicsScene,
-                             QGraphicsView, QPushButton, QMessageBox)
+                             QGraphicsView, QPushButton, QMessageBox, QVBoxLayout, QWidget, QDockWidget, QMainWindow,
+                             QScrollArea, QLabel)
+from PyQt5.uic.properties import QtCore, QtGui
 
+from mainWindow import MainWindow
 from Edge import Edge
 from NewArc import NewArc
 from Node import Node
@@ -13,12 +16,15 @@ from Transition import Transition
 
 
 class GraphWidget(QGraphicsView):
-    def __init__(self):
-        super(GraphWidget, self).__init__()
+    # def __init__(self):
+    #     super(GraphWidget, self).__init__()
+    signal = pyqtSignal(int)
+    def __init__(self, parent=None):
+        QGraphicsView.__init__(self, parent=parent)
 
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        self.scene.setSceneRect(-200, -200, 600, 600)
+        self.scene.setSceneRect(-200, -200, 800, 800)
 
         self.setScene(self.scene)
         self.setCacheMode(QGraphicsView.CacheBackground)
@@ -31,6 +37,7 @@ class GraphWidget(QGraphicsView):
         self.addPlaceBtn.move(5, 5)
         self.addPlaceBtn.setCheckable(True)
         self.addPlaceBtn.clicked.connect(self.setActiveButton)
+        # self.addPlaceBtn.setShortcut("Ctrl+Z")
 
         self.addTransitionBtn = QPushButton("add transition", self)
         self.addTransitionBtn.move(155, 5)
@@ -61,6 +68,9 @@ class GraphWidget(QGraphicsView):
         self.arcs = []
         self.activeState = None
         self.activeElements = []
+        self.activeElement = None
+
+
 
 
     def setActiveButton(self):
@@ -93,13 +103,23 @@ class GraphWidget(QGraphicsView):
     #         # self.activeElements.remove(element)
 
     def keyPressEvent(self, event):
+        # print(self.activeElement.active)
+        # self.activeElement.active = False
+        # self.activeElement.update()
         print("XD")
-        for element in self.activeElements:
-            print(element)
-            element.active = False
-            element.setActivated(False)
-        key = event.key()
+        self.start()
+        # for element in self.activeElements:
+        #     print(element)
+        #     element.active = False
+        #     element.setActivated(False)
+        # key = event.key()
 
+
+    def start(self):
+
+        o = MainWindow()
+        self.signal.connect(o.onJob)
+        self.signal.emit(10)
 
     def mousePressEvent(self, event):
         items = self.items(event.pos())
@@ -112,7 +132,7 @@ class GraphWidget(QGraphicsView):
                         item.active = True
                         print(item)
                         self.activeElements.append(item)
-                        print(self.activeElements)
+                        self.activeElement = item
                     elif isinstance(item, (Transition, Place)) and item.active is True:
                         item.active = False
                         # self.activeElements.remove(item)
@@ -158,7 +178,6 @@ class GraphWidget(QGraphicsView):
                     msgBox = QMessageBox()
                     msgBox.information(self, "Information", "Can't connect same type nodes")
 
-
         elif event.button() == Qt.MouseButton.RightButton:
             self.rightButtonPressed = True
             self.panStartX = event.x()
@@ -198,7 +217,7 @@ class GraphWidget(QGraphicsView):
             return
 
     def wheelEvent(self, event):
-        self.scaleView(math.pow(2.0, -event.angleDelta().y() / 240.0))
+        self.scaleView(math.pow(2.0, +event.angleDelta().y() / 240.0))
 
     def scaleView(self, scaleFactor):
         factor = self.transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width()
@@ -209,12 +228,4 @@ class GraphWidget(QGraphicsView):
         self.scale(scaleFactor, scaleFactor)
 
 
-if __name__ == '__main__':
-    import sys
 
-    app = QApplication(sys.argv)
-
-    widget = GraphWidget()
-    widget.show()
-
-    sys.exit(app.exec_())

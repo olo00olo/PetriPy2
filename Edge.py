@@ -18,7 +18,7 @@ class Edge(QGraphicsItem):
 
         self.id = next(self.newid)
 
-        self.arrowSize = 10.0
+        self.arrowSize = 6.0
         self.sourcePoint = QPointF()
         self.destPoint = QPointF()
 
@@ -50,7 +50,7 @@ class Edge(QGraphicsItem):
         lenList = []
         lineList = []
 
-        l = [QPointF(-3.5, 0), QPointF(3.5, 0), QPointF(0, -3.5), QPointF(0, 3.5)]
+        l = [QPointF(-2.5, 0), QPointF(2.5, 0), QPointF(0, -2.5), QPointF(0, 2.5)]
 
         for e in l:
             for i in l:
@@ -70,11 +70,11 @@ class Edge(QGraphicsItem):
         if not self.source or not self.dest:
             return
 
-        # self.findNearest()
-        # line = self.findNearest()
-        #
-        line = QLineF(self.mapFromItem(self.source, 0, 0),
-                      self.mapFromItem(self.dest, 0, 0))
+        self.findNearest()
+        line = self.findNearest()
+
+        # line = QLineF(self.mapFromItem(self.source, 0, 0),
+        #               self.mapFromItem(self.dest, 0, 0))
         length = line.length()
 
 

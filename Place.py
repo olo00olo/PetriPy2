@@ -41,11 +41,12 @@ class Place(Node):
         gradient = QRadialGradient(-3, -3, 10)
         print(self.active, "Place")
         if option.state & QStyle.State_Sunken or self.active is True:
+
             gradient.setCenter(3, 3)
             gradient.setFocalPoint(3, 3)
             gradient.setColorAt(0, QColor(Qt.darkYellow).lighter(120))
         else:
-            gradient.setColorAt(0, Qt.red)
+            gradient.setColorAt(0, Qt.blue)
 
         painter.setBrush(QBrush(gradient))
         painter.setPen(QPen(Qt.black, 0))
