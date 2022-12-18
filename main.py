@@ -6,12 +6,13 @@ from PyQt5.QtGui import (QPainter)
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
                              QGraphicsView, QPushButton, QMessageBox, QMenu, QAction)
 
+
 from Edge import Edge
 from NewArc import NewArc
 from Place import Place
 from Transition import Transition
 from mainWindow import MainWindow
-
+from Saver import saver
 
 class GraphWidget(QGraphicsView):
     # def __init__(self):
@@ -50,7 +51,9 @@ class GraphWidget(QGraphicsView):
 
         self.saveNetButton = QPushButton("save net", self)
         self.saveNetButton.move(455, 5)
-        self.saveNetButton.clicked.connect(self.saveNet)
+        self.saveNetButton.clicked.connect(lambda: saver(self.placesDict, self.transitionsDict, self.arcsDict))
+
+
 
         self.scale(1.8, 1.8)
         self.setMinimumSize(400, 400)
@@ -72,7 +75,6 @@ class GraphWidget(QGraphicsView):
         self.activeState = None
         self.activeElements = []
         self.activeElement = None
-
 
 
 
