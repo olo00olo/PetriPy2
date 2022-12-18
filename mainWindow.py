@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent=parent)
+        print("1")
         from main import GraphWidget
 
         self.setGeometry(50, 50, 800, 800)
@@ -14,6 +15,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(graphWidget)
 
         self.dock = QDockWidget("menu")
+        self.dock.setMinimumWidth(200)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
 
     @pyqtSlot(int)

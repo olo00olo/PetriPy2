@@ -1,18 +1,16 @@
+import json
 import math
 
-from PyQt5.QtCore import (QRectF, Qt, QPoint, pyqtSignal, pyqtSlot)
+from PyQt5.QtCore import (QRectF, Qt, pyqtSignal)
 from PyQt5.QtGui import (QPainter)
-from PyQt5.QtWidgets import (QApplication, QGraphicsItem, QGraphicsScene,
-                             QGraphicsView, QPushButton, QMessageBox, QVBoxLayout, QWidget, QDockWidget, QMainWindow,
-                             QScrollArea, QLabel)
-from PyQt5.uic.properties import QtCore, QtGui
+from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
+                             QGraphicsView, QPushButton, QMessageBox, QMenu, QAction)
 
-from mainWindow import MainWindow
 from Edge import Edge
 from NewArc import NewArc
-from Node import Node
 from Place import Place
 from Transition import Transition
+from mainWindow import MainWindow
 
 
 class GraphWidget(QGraphicsView):
@@ -21,6 +19,7 @@ class GraphWidget(QGraphicsView):
     signal = pyqtSignal(int)
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent=parent)
+        print("2")
 
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
@@ -48,6 +47,10 @@ class GraphWidget(QGraphicsView):
         self.addArcButton.move(305, 5)
         self.addArcButton.setCheckable(True)
         self.addArcButton.clicked.connect(self.setActiveButton)
+
+        self.saveNetButton = QPushButton("save net", self)
+        self.saveNetButton.move(455, 5)
+        self.saveNetButton.clicked.connect(self.saveNet)
 
         self.scale(1.8, 1.8)
         self.setMinimumSize(400, 400)
@@ -108,12 +111,47 @@ class GraphWidget(QGraphicsView):
         # self.activeElement.update()
         print("XD")
         self.start()
+
         # for element in self.activeElements:
         #     print(element)
         #     element.active = False
         #     element.setActivated(False)
         # key = event.key()
 
+    def deleteItem(self, item):
+        self.scene.removeItem(item)
+
+    def saveNet(self):
+        places = []
+        transitions = []
+        arcs = []
+        arcsWrapper = []
+
+        for key, value in self.placesDict.items():
+            places.append(key)
+            print(places)
+
+        for key, value in self.transitionsDict.items():
+            transitions.append(key)
+
+        for key, value in self.arcsDict.items():
+            for key2, value2 in value[0].items():
+                a = key2
+            for key2, value2 in value[1].items():
+                b = key2
+            arcsWrapper.append(a)
+            arcsWrapper.append(b)
+            arcs.append(arcsWrapper)
+            arcsWrapper = []
+
+        places = json.dumps(places)
+        transitions = json.dumps(transitions)
+        arcs = json.dumps(arcs)
+
+        with open('output.txt', 'w') as filehandle:
+            filehandle.write("places: {}".format(places))
+            filehandle.write("transitions: {}".format(transitions))
+            filehandle.write("arcs: {}".format(arcs))
 
     def start(self):
 
@@ -179,10 +217,19 @@ class GraphWidget(QGraphicsView):
                     msgBox.information(self, "Information", "Can't connect same type nodes")
 
         elif event.button() == Qt.MouseButton.RightButton:
-            self.rightButtonPressed = True
+            for item in items:
+                if isinstance(item, (Transition, Place, Edge)):
+                    menu = QMenu(self)
+                    deleteItem = QAction('Delete', self)
+                    deleteItem.triggered.connect(lambda: self.deleteItem(item))
+                    menu.addAction(deleteItem)
+                    print(self.mapToScene(event.pos()))
+                    menu.popup((self.mapToGlobal(event.pos())))
+
+            # self.rightButtonPressed = True
             self.panStartX = event.x()
             self.panStartY = event.y()
-            self.setCursor(Qt.ClosedHandCursor)
+            # self.setCursor(Qt.ClosedHandCursor)
             event.accept()
 
         elif event.button() == Qt.MouseButton.MiddleButton:
@@ -217,7 +264,7 @@ class GraphWidget(QGraphicsView):
             return
 
     def wheelEvent(self, event):
-        self.scaleView(math.pow(2.0, +event.angleDelta().y() / 240.0))
+        self.scaleView(math.pow(2.0, + event.angleDelta().y() / 240.0))
 
     def scaleView(self, scaleFactor):
         factor = self.transform().scale(scaleFactor, scaleFactor).mapRect(QRectF(0, 0, 1, 1)).width()
