@@ -104,7 +104,7 @@ class Edge(QGraphicsItem):
                              self.destPoint.y() - self.sourcePoint.y())).normalized().adjusted(-extra, -extra, extra,
                                                                                                extra)
 
-
+    # TODO: active edge highlight
     def paint(self, painter, option, widget):
         if not self.source or not self.dest:
             return

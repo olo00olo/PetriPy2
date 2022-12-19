@@ -17,9 +17,9 @@ class Transition(Node):
         self.id = next(self.newid)
 
         self.labels()
-        self.token()
 
         self.active = False
+        print(self.inArcs)
 
     def labels(self):
         text = str(self.id)

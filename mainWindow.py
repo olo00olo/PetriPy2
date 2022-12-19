@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit
 
 
 class MainWindow(QMainWindow):
@@ -16,6 +16,19 @@ class MainWindow(QMainWindow):
         self.dock = QDockWidget("menu")
         self.dock.setMinimumWidth(200)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
+
+        self.btn = QPushButton("123", self)
+        self.btn.clicked.connect(self.addLine)
+
+        self.line = QLineEdit()
+
+
+        self.dock.setWidget(self.btn)
+        self.dock.setWidget(self.line)
+
+
+    def addLine(self):
+        print("XD")
 
     @pyqtSlot(int)
     def onJob(self, a):

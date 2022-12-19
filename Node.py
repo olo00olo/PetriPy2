@@ -21,11 +21,8 @@ class Node(QGraphicsItem):
         self.setZValue(1)
 
         # self.active = False
-        self.inArcs = []
-        self.outArcs = []
-
-    # TODO: scaling and moving
-
+        self.inArcs = {}
+        self.outArcs = {}
 
     def token(self):
         self.tokens = QGraphicsTextItem("0", self)

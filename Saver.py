@@ -26,6 +26,7 @@ def saver(places, transitions, arcs):
         transitionsDict = {}
         i += 1
 
+    #TODO not working after adding edge ref
     i = 1
     for arcId, arcRef in arcs.items():
         for key, value in arcRef[0].items():

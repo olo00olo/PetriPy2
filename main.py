@@ -6,7 +6,6 @@ from PyQt5.QtGui import (QPainter)
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
                              QGraphicsView, QPushButton, QMessageBox, QMenu, QAction)
 
-
 from Edge import Edge
 from NewArc import NewArc
 from Place import Place
@@ -14,10 +13,12 @@ from Transition import Transition
 from mainWindow import MainWindow
 from Saver import saver
 
+
 class GraphWidget(QGraphicsView):
     # def __init__(self):
     #     super(GraphWidget, self).__init__()
     signal = pyqtSignal(int)
+
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent=parent)
 
@@ -52,8 +53,6 @@ class GraphWidget(QGraphicsView):
         self.saveNetButton.move(455, 5)
         self.saveNetButton.clicked.connect(lambda: saver(self.placesDict, self.transitionsDict, self.arcsDict))
 
-
-
         self.scale(1.8, 1.8)
         self.setMinimumSize(400, 400)
         self.setWindowTitle("PetryPy")
@@ -74,8 +73,6 @@ class GraphWidget(QGraphicsView):
         self.activeState = None
         self.activeElements = []
         self.activeElement = None
-
-
 
     def setActiveButton(self):
         self.n.reset()
@@ -121,18 +118,18 @@ class GraphWidget(QGraphicsView):
 
     def deleteItem(self, item):
         self.scene.removeItem(item)
-        if isinstance(item, Place):
-            for arc in item.inArcs:
-                self.scene.removeItem(arc[0])
-                self.arcsDict.pop(arc[0].id)
-                for key, value in arc[1].items():
-                    print(value.outArcs)
-                    print(value.outArcs[0][0])
-                    # value.outArcs.remove()
-            # print(self.arcsDict)
-            # print(self.placesDict)
-            self.placesDict.pop(item.id)
 
+        if isinstance(item, (Place, Transition)):
+            for arcId, arcArr in item.inArcs.items():
+                self.scene.removeItem(arcArr[0])
+                ((next(iter(arcArr[1].values()))).outArcs).pop(arcId)
+
+            for arcId, arcArr in item.outArcs.items():
+                self.scene.removeItem(arcArr[0])
+                ((next(iter(arcArr[2].values()))).inArcs).pop(arcId)
+
+        # TODO removing edge:
+        # elif isinstance(item, Edge):
 
     def start(self):
 
@@ -144,7 +141,7 @@ class GraphWidget(QGraphicsView):
         items = self.items(event.pos())
 
         if event.button() == Qt.MouseButton.LeftButton:
-            #default state
+            # default state
             if self.activeState == 0:
                 for item in items:
                     if isinstance(item, (Transition, Place)) and item.active is False:
@@ -156,9 +153,7 @@ class GraphWidget(QGraphicsView):
                         item.active = False
                         # self.activeElements.remove(item)
 
-
-
-            #add place
+            # add place
             if self.activeState == 1:
                 newPlace = Place(self)
                 newPlace.setPos(self.mapToScene(event.pos()))
@@ -166,8 +161,7 @@ class GraphWidget(QGraphicsView):
                 self.places.append(newPlace)
                 self.placesDict.update({newPlace.id: newPlace})
 
-
-            #add transition
+            # add transition
             if self.activeState == 2:
                 newTransition = Transition(self)
                 newTransition.setPos(self.mapToScene(event.pos()))
@@ -175,8 +169,7 @@ class GraphWidget(QGraphicsView):
                 self.transitions.append(newTransition)
                 self.transitionsDict.update({newTransition.id: newTransition})
 
-
-            #add arc
+            # add arc
             if self.activeState == 3:
                 source, destination, error = self.n.setNode(items)
                 if error is False:
@@ -187,11 +180,11 @@ class GraphWidget(QGraphicsView):
                         newArc.append(ne)
                         newArc.append({self.n.source.id: self.n.source})
                         newArc.append({self.n.destination.id: self.n.destination})
-                        self.n.source.outArcs.append(newArc)
-                        self.n.destination.inArcs.append(newArc)
+                        self.n.source.outArcs.update({ne.id: newArc})
+                        self.n.destination.inArcs.update({ne.id: newArc})
+                        self.arcsDict.update({ne.id: newArc})
                         self.arcs.append(newArc)
                         self.n.reset()
-                        self.arcsDict.update({ne.id: newArc})
                         print(self.arcsDict)
                 else:
                     self.n.reset()
@@ -234,7 +227,6 @@ class GraphWidget(QGraphicsView):
             QGraphicsView.mouseMoveEvent(self, event)
             return
 
-
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.RightButton:
             self.rightButtonPressed = False
@@ -255,6 +247,3 @@ class GraphWidget(QGraphicsView):
             return
 
         self.scale(scaleFactor, scaleFactor)
-
-
-
