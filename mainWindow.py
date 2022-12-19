@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent=parent)
-        print("1")
         from main import GraphWidget
 
         self.setGeometry(50, 50, 800, 800)

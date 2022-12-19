@@ -20,7 +20,6 @@ class GraphWidget(QGraphicsView):
     signal = pyqtSignal(int)
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent=parent)
-        print("2")
 
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
