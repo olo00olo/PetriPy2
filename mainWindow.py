@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit, QMenu
 
 
 class MainWindow(QMainWindow):
@@ -12,6 +12,12 @@ class MainWindow(QMainWindow):
         self.xd = 1
         graphWidget = GraphWidget(self)
         self.setCentralWidget(graphWidget)
+
+        # TODO: menu bar
+        self.menuBar = self.menuBar()
+        self.menuBar.addAction("one")
+
+
 
         self.dock = QDockWidget("menu")
         self.dock.setMinimumWidth(200)

@@ -119,17 +119,28 @@ class GraphWidget(QGraphicsView):
     def deleteItem(self, item):
         self.scene.removeItem(item)
 
+        if isinstance(item, Place):
+            self.placesDict.pop(item.id)
+        elif isinstance(item, Transition):
+            self.transitionsDict.pop(item.id)
+
         if isinstance(item, (Place, Transition)):
             for arcId, arcArr in item.inArcs.items():
+                self.arcsDict.pop(arcId)
                 self.scene.removeItem(arcArr[0])
-                ((next(iter(arcArr[1].values()))).outArcs).pop(arcId)
+                (next(iter(arcArr[1].values()))).outArcs.pop(arcId)
 
             for arcId, arcArr in item.outArcs.items():
+                self.arcsDict.pop(arcId)
                 self.scene.removeItem(arcArr[0])
-                ((next(iter(arcArr[2].values()))).inArcs).pop(arcId)
+                (next(iter(arcArr[2].values()))).inArcs.pop(arcId)
 
-        # TODO removing edge:
-        # elif isinstance(item, Edge):
+        elif isinstance(item, Edge):
+            (next(iter(self.arcsDict[item.id][1].values()))).outArcs.pop(item.id)
+            (next(iter(self.arcsDict[item.id][2].values()))).inArcs.pop(item.id)
+            self.arcsDict.pop(item.id)
+
+
 
     def start(self):
 

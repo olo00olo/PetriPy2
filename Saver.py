@@ -29,13 +29,13 @@ def saver(places, transitions, arcs):
     #TODO not working after adding edge ref
     i = 1
     for arcId, arcRef in arcs.items():
-        for key, value in arcRef[0].items():
+        for key, value in arcRef[1].items():
             if isinstance(value, Place):
                 arcsDict.update({"P": key})
             else:
                 arcsDict.update({"T": key})
 
-        for key, value in arcRef[1].items():
+        for key, value in arcRef[2].items():
             if isinstance(value, Place):
                 arcsDict.update({"P": key})
             else:
