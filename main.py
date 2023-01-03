@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
                              QGraphicsView, QPushButton, QMessageBox, QMenu, QAction)
 
 from Edge import Edge
+from Loader import loader
 from NewArc import NewArc
 from Place import Place
 from Transition import Transition
@@ -102,6 +103,10 @@ class GraphWidget(QGraphicsView):
     #         print(element.active)
     #         element.active = False
     #         # self.activeElements.remove(element)
+
+    def loadNet(self):
+        loader(self)
+
 
     def keyPressEvent(self, event):
         # print(self.activeElement.active)
