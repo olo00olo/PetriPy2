@@ -159,6 +159,7 @@ class GraphWidget(QGraphicsView):
         if event.button() == Qt.MouseButton.LeftButton:
             # default state
             if self.activeState == 0:
+                print(items)
                 for item in items:
                     if isinstance(item, (Transition, Place)) and item.active is False:
                         item.active = True
@@ -188,8 +189,16 @@ class GraphWidget(QGraphicsView):
             # add arc
             if self.activeState == 3:
                 source, destination, error = self.n.setNode(items)
+                for key, value in self.arcsDict.items():
+                    if list(value[1].values())[0] is source and list(value[2].values())[0] is destination:
+                        error = True
+                        break
+                    elif list(value[1].values())[0] is destination and list(value[2].values())[0] is source:
+                        error = True
+                        break
                 if error is False:
                     if destination is not None:
+                        print("aaa")
                         ne = Edge(source, destination)
                         self.scene.addItem(ne)
                         newArc = []
@@ -201,11 +210,12 @@ class GraphWidget(QGraphicsView):
                         self.arcsDict.update({ne.id: newArc})
                         self.arcs.append(newArc)
                         self.n.reset()
-                        print(self.arcsDict)
+
                 else:
                     self.n.reset()
                     msgBox = QMessageBox()
-                    msgBox.information(self, "Information", "Can't connect same type nodes")
+                    msgBox.information(self, "Information", "Can't connect same type nodes or nodes are already "
+                                                            "connected")
 
         elif event.button() == Qt.MouseButton.RightButton:
             for item in items:
