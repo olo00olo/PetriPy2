@@ -9,12 +9,14 @@ from Node import Node
 
 class Transition(Node):
     Type = QGraphicsItem.UserType + 1
-    newid = itertools.count(1)
+
+    counter = 0
 
     def __init__(self, graphWidget):
         super().__init__(graphWidget)
 
-        self.id = next(self.newid)
+        self.id = Transition.counter
+        Transition.counter += 1
 
         self.labels()
 

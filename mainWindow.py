@@ -21,7 +21,7 @@ class MainWindow(QMainWindow):
 
         file_menu = self.menuBar.addMenu("&File")
         save_action = QAction("&Save", self)
-        save_action.triggered.connect(lambda: saver(graphWidget.placesDict, graphWidget.transitionsDict, graphWidget.arcsDict))
+        save_action.triggered.connect(lambda: graphWidget.saveNet())
         file_menu.addAction(save_action)
 
         load_action = QAction("&Open", self)

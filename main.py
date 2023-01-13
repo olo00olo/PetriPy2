@@ -52,7 +52,7 @@ class GraphWidget(QGraphicsView):
 
         self.saveNetButton = QPushButton("save net", self)
         self.saveNetButton.move(455, 5)
-        self.saveNetButton.clicked.connect(lambda: saver(self.placesDict, self.transitionsDict, self.arcsDict))
+        self.saveNetButton.clicked.connect(lambda: saver(self))
 
         self.scale(1.8, 1.8)
         self.setMinimumSize(400, 400)
@@ -103,6 +103,9 @@ class GraphWidget(QGraphicsView):
     #         print(element.active)
     #         element.active = False
     #         # self.activeElements.remove(element)
+
+    def saveNet(self):
+        saver(self)
 
     def loadNet(self):
         loader(self)
@@ -191,14 +194,14 @@ class GraphWidget(QGraphicsView):
                 source, destination, error = self.n.setNode(items)
                 for key, value in self.arcsDict.items():
                     if list(value[1].values())[0] is source and list(value[2].values())[0] is destination:
-                        error = True
+                        error = 2
                         break
-                    elif list(value[1].values())[0] is destination and list(value[2].values())[0] is source:
-                        error = True
-                        break
-                if error is False:
+                    # elif list(value[1].values())[0] is destination and list(value[2].values())[0] is source:
+                    #     error = 2
+                    #     break
+
+                if error == 0:
                     if destination is not None:
-                        print("aaa")
                         ne = Edge(source, destination)
                         self.scene.addItem(ne)
                         newArc = []
@@ -211,11 +214,15 @@ class GraphWidget(QGraphicsView):
                         self.arcs.append(newArc)
                         self.n.reset()
 
-                else:
+                elif error == 1:
                     self.n.reset()
                     msgBox = QMessageBox()
-                    msgBox.information(self, "Information", "Can't connect same type nodes or nodes are already "
-                                                            "connected")
+                    msgBox.information(self, "Information", "Can't connect same type nodes")
+
+                elif error == 2:
+                    self.n.reset()
+                    msgBox = QMessageBox()
+                    msgBox.information(self, "Information", "This arc already exists")
 
         elif event.button() == Qt.MouseButton.RightButton:
             for item in items:

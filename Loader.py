@@ -1,7 +1,7 @@
 import json
 from json import JSONDecodeError
 
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
 from Edge import Edge
 from Place import Place
@@ -11,8 +11,16 @@ from Transition import Transition
 def loader(graphWidget):
     places = {}
     transitions = {}
-    with open('output.json', 'r') as convert_file:
+
+    filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.txt')
+    path = filename[0]
+
+    with open(path, 'r') as convert_file:
         try:
+            Place.counter = 0
+            Transition.counter = 0
+            Edge.counter = 0
+
             graphWidget.scene.clear()
 
             net = json.load(convert_file)

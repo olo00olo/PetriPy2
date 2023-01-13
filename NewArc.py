@@ -6,7 +6,7 @@ class NewArc:
     def __init__(self):
         self.source = None
         self.destination = None
-        self.error = False
+        self.error = 0
 
     def searchNode(self, nodes):
         findNode = None
@@ -24,7 +24,7 @@ class NewArc:
             self.source = node
         else:
             if type(node) is type(self.source):
-                self.error = True
+                self.error = 1
             else:
                 self.destination = node
         return self.source, self.destination, self.error
@@ -32,4 +32,4 @@ class NewArc:
     def reset(self):
         self.source = None
         self.destination = None
-        self.error = False
+        self.error = 0

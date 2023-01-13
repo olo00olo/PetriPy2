@@ -11,12 +11,14 @@ class Edge(QGraphicsItem):
     TwoPi = 2.0 * Pi
 
     Type = QGraphicsItem.UserType + 2
-    newid = itertools.count(1)
+
+    counter = 0
 
     def __init__(self, sourceNode, destNode):
         super(Edge, self).__init__()
 
-        self.id = next(self.newid)
+        self.id = Edge.counter
+        Edge.counter += 1
 
         self.arrowSize = 6.0
         self.sourcePoint = QPointF()

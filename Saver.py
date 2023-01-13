@@ -1,17 +1,19 @@
 import json
 
+from PyQt5.QtWidgets import QFileDialog
+
 from Place import Place
 
 
-def saver(places, transitions, arcs):
+def saver(graphWidget):
+    print("XD")
     i = 1
     placesDict = {}
     transitionsDict = {}
     arcsDict = {}
-
     all = {"places": {}, "transitions": {}, "arcs": {}}
 
-    for placeId, placeRef in places.items():
+    for placeId, placeRef in graphWidget.placesDict.items():
         placesDict.update({"id": placeId})
         placesDict.update({"pos": [round(placeRef.x(), 2), round(placeRef.y(), 2)]})
         all["places"].update({i: placesDict})
@@ -19,7 +21,7 @@ def saver(places, transitions, arcs):
         i += 1
 
     i = 1
-    for transitionId, transitionRef in transitions.items():
+    for transitionId, transitionRef in graphWidget.transitionsDict.items():
         transitionsDict.update({"id": transitionId})
         transitionsDict.update({"pos": [round(transitionRef.x(), 2), round(transitionRef.y(), 2)]})
         all["transitions"].update({i: transitionsDict})
@@ -27,7 +29,7 @@ def saver(places, transitions, arcs):
         i += 1
 
     i = 1
-    for arcId, arcRef in arcs.items():
+    for arcId, arcRef in graphWidget.arcsDict.items():
         for key, value in arcRef[1].items():
             if isinstance(value, Place):
                 arcsDict.update({"P": key})
@@ -44,5 +46,8 @@ def saver(places, transitions, arcs):
         arcsDict = {}
         i += 1
 
-    with open('output.json', 'w') as convert_file:
+    filename = QFileDialog.getSaveFileName(graphWidget, 'Select file', '*.json')
+    path = filename[0]
+
+    with open(path, 'w') as convert_file:
         convert_file.write(json.dumps(all))

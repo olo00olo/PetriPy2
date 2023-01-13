@@ -7,18 +7,22 @@ from Node import Node
 import itertools
 
 class Place(Node):
-    Type = QGraphicsItem.UserType + 1
-    newid = itertools.count(1)
-
+    # Type = QGraphicsItem.UserType + 1
+    counter = 0
     def __init__(self, graphWidget):
         super().__init__(graphWidget)
 
-        self.id = next(self.newid)
+        self.id = Place.counter
+        Place.counter += 1
 
         self.labels()
         self.token()
 
         self.active = False
+
+    def setId(self, id):
+        self.id = id
+        print(self.id)
 
     def setActivated(self, bool):
         self.active = bool
@@ -29,6 +33,7 @@ class Place(Node):
         text = "P" + text
         self.label = QGraphicsTextItem(text, self)
         self.label.setPos(-20, -25)
+
     def shape(self):
         path = QPainterPath()
         path.addEllipse(-10, -10, 20, 20)
