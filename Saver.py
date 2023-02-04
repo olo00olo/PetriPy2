@@ -49,5 +49,8 @@ def saver(graphWidget):
     filename = QFileDialog.getSaveFileName(graphWidget, 'Select file', '*.json')
     path = filename[0]
 
-    with open(path, 'w') as convert_file:
-        convert_file.write(json.dumps(all))
+    try:
+        with open(path, 'w') as convert_file:
+            convert_file.write(json.dumps(all))
+    except:
+        print("Couldn't open file")

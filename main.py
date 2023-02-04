@@ -18,7 +18,7 @@ from Saver import saver
 class GraphWidget(QGraphicsView):
     # def __init__(self):
     #     super(GraphWidget, self).__init__()
-    signal = pyqtSignal(int)
+    signal = pyqtSignal(object)
 
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent=parent)
@@ -116,7 +116,7 @@ class GraphWidget(QGraphicsView):
         # self.activeElement.active = False
         # self.activeElement.update()
         print("XD")
-        self.start()
+        # self.start()
 
         # for element in self.activeElements:
         #     print(element)
@@ -150,11 +150,12 @@ class GraphWidget(QGraphicsView):
 
 
 
-    def start(self):
+    def start(self, obj):
 
         o = MainWindow()
         self.signal.connect(o.onJob)
-        self.signal.emit(10)
+        print(obj, "XD")
+        self.signal.emit(obj)
 
     def mousePressEvent(self, event):
         items = self.items(event.pos())
@@ -166,6 +167,7 @@ class GraphWidget(QGraphicsView):
                 for item in items:
                     if isinstance(item, (Transition, Place)) and item.active is False:
                         item.active = True
+                        self.start(item)
                         print(item)
                         self.activeElements.append(item)
                         self.activeElement = item
