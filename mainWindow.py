@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit, QMenu, QWidget, \
-    QHBoxLayout, QAction, QFormLayout
+    QHBoxLayout, QAction, QFormLayout, QLabel
 
 from Saver import saver
 
@@ -44,8 +44,8 @@ class MainWindow(QMainWindow):
 
         self.dock.setWidget(self.dockedWidget)
 
-
-
+        self.label = QLabel("XDDD")
+        self.verticalLayout.addWidget(self.label)
 
         self.newLineBtn = QPushButton("+", self)
         self.newLineBtn.clicked.connect(self.addLine)
@@ -61,9 +61,7 @@ class MainWindow(QMainWindow):
         # self.removeLineBtn.clicked.connect(lambda: self.removeLine(self.horizontalLayout))
         # self.verticalLayout.addLayout(self.horizontalLayout)
         self.verticalLayout.addWidget(self.newLineBtn)
-
         self.verticalLayout.setAlignment(Qt.AlignTop)
-
 
 
 

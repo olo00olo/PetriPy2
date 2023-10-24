@@ -9,16 +9,37 @@ import itertools
 class Place(Node):
     # Type = QGraphicsItem.UserType + 1
     counter = 0
+    tokens = 0
+    capacityValue = 1
     def __init__(self, graphWidget):
         super().__init__(graphWidget)
 
         self.id = Place.counter
         Place.counter += 1
 
+        self.tokens = (Place.tokens)
+
         self.labels()
         self.token()
+        self.capacity()
 
         self.active = False
+
+    def token(self):
+        self.tokenTextItem = QGraphicsTextItem("0", self)
+        self.tokenTextItem.setPos(-7, -11)
+        # if self.tokens > 1:
+        #     self.capacity()
+
+    def capacity(self):
+        if self.capacityValue > 1:
+            self.capacityTextItem = QGraphicsTextItem("0", self)
+            self.capacityTextItem.setPos(-7, -15)
+            self.capacityValue = 0
+            self.fractionLine = QGraphicsTextItem(chr(95), self)
+            self.fractionLine.setPos(-7, -15)
+
+
 
     def setId(self, id):
         self.id = id

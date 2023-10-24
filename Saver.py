@@ -6,7 +6,7 @@ from Place import Place
 
 
 def saver(graphWidget):
-    print("XD")
+    print("saver init")
     i = 1
     placesDict = {}
     transitionsDict = {}

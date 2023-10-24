@@ -29,7 +29,7 @@ class GraphWidget(QGraphicsView):
 
         self.setScene(self.scene)
         self.setCacheMode(QGraphicsView.CacheBackground)
-        self.setViewportUpdateMode(QGraphicsView.BoundingRectViewportUpdate)
+        # self.setViewportUpdateMode(QGraphicsView.BoundingRectViewportUpdate)
         self.setRenderHint(QPainter.Antialiasing)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
@@ -71,7 +71,7 @@ class GraphWidget(QGraphicsView):
         self.places = []
         self.transitions = []
         self.arcs = []
-        self.activeState = None
+        self.activeState = 0
         self.activeElements = []
         self.activeElement = None
 
@@ -163,6 +163,7 @@ class GraphWidget(QGraphicsView):
         if event.button() == Qt.MouseButton.LeftButton:
             # default state
             if self.activeState == 0:
+                print("XDDDDDDDDDDDDDDDDF")
                 print(items)
                 for item in items:
                     if isinstance(item, (Transition, Place)) and item.active is False:

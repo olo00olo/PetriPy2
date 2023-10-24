@@ -13,7 +13,7 @@ class Node(QGraphicsItem):
         self.newPos = QPointF()
 
         self.label = None
-        self.tokens = None
+        # self.tokens = None
 
         self.setFlag(QGraphicsItem.ItemIsMovable)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges)
@@ -24,9 +24,9 @@ class Node(QGraphicsItem):
         self.inArcs = {}
         self.outArcs = {}
 
-    def token(self):
-        self.tokens = QGraphicsTextItem("0", self)
-        self.tokens.setPos(-7, -11)
+    # def token(self):
+    #     self.tokens = QGraphicsTextItem("0", self)
+    #     self.tokens.setPos(-7, -11)
 
     @staticmethod
     def type(self):
