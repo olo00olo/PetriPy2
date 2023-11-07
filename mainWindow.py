@@ -7,6 +7,7 @@ from Saver import saver
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
+        print(self)
         super(MainWindow, self).__init__(parent=parent)
         from main import GraphWidget
         self.linesArray = []
@@ -15,6 +16,10 @@ class MainWindow(QMainWindow):
         self.xd = 1
         graphWidget = GraphWidget(self)
         self.setCentralWidget(graphWidget)
+
+
+        graphWidget.activeElementChanged.connect(self.changeMenuLabel)
+
 
         # TODO: menu bar
         self.menuBar = self.menuBar()
@@ -44,8 +49,10 @@ class MainWindow(QMainWindow):
 
         self.dock.setWidget(self.dockedWidget)
 
-        self.label = QLabel("XDDD")
-        self.verticalLayout.addWidget(self.label)
+        self.menuItem = None
+        # self.labell = QLabel(str(self.menuItem))
+        self.labell = QLabel("nic")
+        self.verticalLayout.addWidget(self.labell)
 
         self.newLineBtn = QPushButton("+", self)
         self.newLineBtn.clicked.connect(self.addLine)
@@ -65,7 +72,9 @@ class MainWindow(QMainWindow):
 
 
 
+
     def addLine(self):
+        print(self.labell.text())
         horizontalLayout = QHBoxLayout()
         removeLineBtn = QPushButton("-", self)
         edit = QLineEdit(self)
@@ -79,12 +88,39 @@ class MainWindow(QMainWindow):
         edit.deleteLater()
         btn.deleteLater()
         line.setParent(None)
+        print(self.labell.text())
+        # self.labell.setText("XD")
+
+    def changeItemLabel(self):
+        self.aaa = "XD"
+        self.labell.setText("XD")
+        print("XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD", self.labell.text())
+        QApplication.processEvents()
+        self.labell.update()
+        self.labell.repaint()
+
+    def changeMenuLabel(self, a):
+        print(a)
+        self.labell.setText(a)
 
 
     @pyqtSlot(object)
     def onJob(self, a):
-        print(a, "XDDDD")
+        self.aaa = "XD"
+        self.labell.setText("XD")
+        self.changeItemLabel()
 
+        # self.menuItem = str(a)
+        # self.label.setText(str(a))
+        # self.label.repaint()
+        # self.verticalLayout.update()
+        # self.update()
+        # print(a, "onJob")
+        # print(self.label.text(), "label")
+        # QApplication.processEvents()
+
+    def printSth(self):
+        print(self, "sth")
 
 if __name__ == '__main__':
     import sys

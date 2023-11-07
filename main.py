@@ -19,9 +19,15 @@ class GraphWidget(QGraphicsView):
     # def __init__(self):
     #     super(GraphWidget, self).__init__()
     signal = pyqtSignal(object)
+    activeElementChanged = pyqtSignal(str)
+
+    # mainWindow = MainWindow()
 
     def __init__(self, parent=None):
         QGraphicsView.__init__(self, parent=parent)
+
+        # self.mainWindow = MainWindow(self)
+        # self.activeElementChanged.connect(self.mainWindow.changeMenuLabel)
 
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
@@ -163,18 +169,30 @@ class GraphWidget(QGraphicsView):
         if event.button() == Qt.MouseButton.LeftButton:
             # default state
             if self.activeState == 0:
-                print("XDDDDDDDDDDDDDDDDF")
-                print(items)
+                itemClicked = 0
+
                 for item in items:
                     if isinstance(item, (Transition, Place)) and item.active is False:
                         item.active = True
                         self.start(item)
-                        print(item)
                         self.activeElements.append(item)
                         self.activeElement = item
+                        self.start(self.activeElement)
+                        MainWindow().labell.setText("XFF")
+                        self.activeElementChanged.emit("chujowsto")
                     elif isinstance(item, (Transition, Place)) and item.active is True:
-                        item.active = False
+                        # item.active = False
+                        self.activeElement.active = False
+                        self.activeElement = None
+
                         # self.activeElements.remove(item)
+
+                    itemClicked = 1
+
+                if itemClicked == 0:
+                    if self.activeElement != None:
+                        self.activeElement.setActivated(False)
+                        self.activeElement = None
 
             # add place
             if self.activeState == 1:
@@ -183,6 +201,7 @@ class GraphWidget(QGraphicsView):
                 self.scene.addItem(newPlace)
                 self.places.append(newPlace)
                 self.placesDict.update({newPlace.id: newPlace})
+                print(self.placesDict)
 
             # add transition
             if self.activeState == 2:

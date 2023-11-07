@@ -48,6 +48,7 @@ class Place(Node):
     def setActivated(self, bool):
         self.active = bool
         print(self.active)
+        self.update()
 
     def labels(self):
         text = str(self.id)
@@ -67,11 +68,12 @@ class Place(Node):
         gradient = QRadialGradient(-3, -3, 10)
         print(self.active, "Place")
         if option.state & QStyle.State_Sunken or self.active is True:
-
+            print("CHUJCHUJ", self.active)
             gradient.setCenter(3, 3)
             gradient.setFocalPoint(3, 3)
             gradient.setColorAt(0, QColor(Qt.darkYellow).lighter(120))
         else:
+            print("CHUJ", self.active)
             gradient.setColorAt(0, Qt.blue)
 
         painter.setBrush(QBrush(gradient))
