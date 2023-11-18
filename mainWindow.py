@@ -3,11 +3,12 @@ from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton,
     QHBoxLayout, QAction, QFormLayout, QLabel
 
 from Saver import saver
+from VariableWindow import TableWindow
 
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
-        print(self)
+        # print(self)
         super(MainWindow, self).__init__(parent=parent)
         from main import GraphWidget
         self.linesArray = []
@@ -15,10 +16,12 @@ class MainWindow(QMainWindow):
 
         self.xd = 1
         graphWidget = GraphWidget(self)
-        self.setCentralWidget(graphWidget)
 
 
-        graphWidget.activeElementChanged.connect(self.changeMenuLabel)
+        self.tableWindow = None
+        self.activeItem = None
+        graphWidget.activeElementChanged.connect(self.setActiveItem)
+
 
 
         # TODO: menu bar
@@ -40,6 +43,7 @@ class MainWindow(QMainWindow):
 
         self.dock = QDockWidget("menu", self)
         self.dock.setMinimumWidth(250)
+        # self.dock.setFloating(True)
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.dock)
 
         self.verticalLayout = QVBoxLayout()
@@ -51,11 +55,11 @@ class MainWindow(QMainWindow):
 
         self.menuItem = None
         # self.labell = QLabel(str(self.menuItem))
-        self.labell = QLabel("nic")
+        self.labell = QLabel("None item selected")
         self.verticalLayout.addWidget(self.labell)
 
-        self.newLineBtn = QPushButton("+", self)
-        self.newLineBtn.clicked.connect(self.addLine)
+
+
         #
         # self.horizontalLayout = QHBoxLayout()
         #
@@ -67,18 +71,51 @@ class MainWindow(QMainWindow):
         # self.horizontalLayout.addWidget(self.removeLineBtn)
         # self.removeLineBtn.clicked.connect(lambda: self.removeLine(self.horizontalLayout))
         # self.verticalLayout.addLayout(self.horizontalLayout)
-        self.verticalLayout.addWidget(self.newLineBtn)
-        self.verticalLayout.setAlignment(Qt.AlignTop)
+
+
+        self.setCentralWidget(graphWidget)
+
+        # self.dock.setVisible(False)
+        # self.dock.hide()
 
 
 
+
+
+    def placeEditor(self):
+        if self.activeItem is not None:
+            self.newLineBtn = QPushButton("+", self)
+            self.newLineBtn.clicked.connect(self.addLine)
+            editVariablesBtn = QPushButton("Edit variables", self)
+            editVariablesBtn.clicked.connect(self.openVariableTable)
+            self.verticalLayout.addWidget(editVariablesBtn)
+            self.verticalLayout.addWidget(self.newLineBtn)
+            self.verticalLayout.setAlignment(Qt.AlignTop)
+            self.labell = QLabel()
+        else:
+            for i in self.linesArray:
+                self.removeLine(i[0], i[1], i[2])
+                self.linesArray = []
+            for i in reversed(range(self.verticalLayout.count())):
+                self.verticalLayout.itemAt(i).widget().setParent(None)
+
+            self.labell = QLabel("None item selected")
+            self.verticalLayout.addWidget(self.labell)
+            print("n")
+
+    def openVariableTable(self):
+        self.a = TableWindow(self.activeItem)
+        # a.setGeometry(100, 100, 800, 600)
+        self.a.show()
 
     def addLine(self):
-        print(self.labell.text())
+        # variableWindow = TableWindow()
+        # variableWindow.show()
         horizontalLayout = QHBoxLayout()
         removeLineBtn = QPushButton("-", self)
         edit = QLineEdit(self)
-        self.linesArray.append(edit)
+        edit.textChanged.connect(lambda: self.activeItem.addVariable(edit, edit.text()))
+        self.linesArray.append([horizontalLayout, edit, removeLineBtn])
         horizontalLayout.addWidget(edit)
         horizontalLayout.addWidget(removeLineBtn)
         removeLineBtn.clicked.connect(lambda: self.removeLine(horizontalLayout, edit, removeLineBtn))
@@ -88,20 +125,17 @@ class MainWindow(QMainWindow):
         edit.deleteLater()
         btn.deleteLater()
         line.setParent(None)
-        print(self.labell.text())
-        # self.labell.setText("XD")
 
-    def changeItemLabel(self):
-        self.aaa = "XD"
-        self.labell.setText("XD")
-        print("XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD", self.labell.text())
-        QApplication.processEvents()
-        self.labell.update()
-        self.labell.repaint()
 
-    def changeMenuLabel(self, a):
-        print(a)
-        self.labell.setText(a)
+    def setActiveItem(self, a):
+        if a is not None:
+            self.activeItem = a
+            self.labell.setText("P" + str(a.id))
+        else:
+            self.activeItem = None
+            self.labell.setText("None item selected")
+        self.placeEditor()
+
 
 
     @pyqtSlot(object)
@@ -110,17 +144,6 @@ class MainWindow(QMainWindow):
         self.labell.setText("XD")
         self.changeItemLabel()
 
-        # self.menuItem = str(a)
-        # self.label.setText(str(a))
-        # self.label.repaint()
-        # self.verticalLayout.update()
-        # self.update()
-        # print(a, "onJob")
-        # print(self.label.text(), "label")
-        # QApplication.processEvents()
-
-    def printSth(self):
-        print(self, "sth")
 
 if __name__ == '__main__':
     import sys

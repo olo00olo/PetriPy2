@@ -19,7 +19,7 @@ class GraphWidget(QGraphicsView):
     # def __init__(self):
     #     super(GraphWidget, self).__init__()
     signal = pyqtSignal(object)
-    activeElementChanged = pyqtSignal(str)
+    activeElementChanged = pyqtSignal(object)
 
     # mainWindow = MainWindow()
 
@@ -117,11 +117,11 @@ class GraphWidget(QGraphicsView):
         loader(self)
 
 
-    def keyPressEvent(self, event):
+    # def keyPressEvent(self, event):
         # print(self.activeElement.active)
         # self.activeElement.active = False
         # self.activeElement.update()
-        print("XD")
+        # print("XD")
         # self.start()
 
         # for element in self.activeElements:
@@ -156,12 +156,12 @@ class GraphWidget(QGraphicsView):
 
 
 
-    def start(self, obj):
-
-        o = MainWindow()
-        self.signal.connect(o.onJob)
-        print(obj, "XD")
-        self.signal.emit(obj)
+    # def start(self, obj):
+    #
+    #     o = MainWindow()
+    #     self.signal.connect(o.onJob)
+    #     print(obj, "XD")
+    #     self.signal.emit(obj)
 
     def mousePressEvent(self, event):
         items = self.items(event.pos())
@@ -173,17 +173,18 @@ class GraphWidget(QGraphicsView):
 
                 for item in items:
                     if isinstance(item, (Transition, Place)) and item.active is False:
-                        item.active = True
-                        self.start(item)
-                        self.activeElements.append(item)
+                        if self.activeElement is not None and item is not self.activeElement:
+                            self.activeElement.setActivated(False)
+                            self.activeElementChanged.emit(None)
                         self.activeElement = item
-                        self.start(self.activeElement)
-                        MainWindow().labell.setText("XFF")
-                        self.activeElementChanged.emit("chujowsto")
+                        item.setActivated(True)
+                        # self.activeElements.append(item)
+                        self.activeElementChanged.emit(item)
                     elif isinstance(item, (Transition, Place)) and item.active is True:
-                        # item.active = False
-                        self.activeElement.active = False
+                        item.setActivated(False)
+                        # self.activeElement.active = False
                         self.activeElement = None
+                        self.activeElementChanged.emit(None)
 
                         # self.activeElements.remove(item)
 
@@ -193,6 +194,8 @@ class GraphWidget(QGraphicsView):
                     if self.activeElement != None:
                         self.activeElement.setActivated(False)
                         self.activeElement = None
+                        self.activeElementChanged.emit(None)
+
 
             # add place
             if self.activeState == 1:
@@ -201,7 +204,7 @@ class GraphWidget(QGraphicsView):
                 self.scene.addItem(newPlace)
                 self.places.append(newPlace)
                 self.placesDict.update({newPlace.id: newPlace})
-                print(self.placesDict)
+                # print(self.placesDict)
 
             # add transition
             if self.activeState == 2:
@@ -249,11 +252,13 @@ class GraphWidget(QGraphicsView):
         elif event.button() == Qt.MouseButton.RightButton:
             for item in items:
                 if isinstance(item, (Transition, Place, Edge)):
+                    print(item.id, item.variables)
+
                     menu = QMenu(self)
                     deleteItem = QAction('Delete', self)
                     deleteItem.triggered.connect(lambda: self.deleteItem(item))
                     menu.addAction(deleteItem)
-                    print(self.mapToScene(event.pos()))
+                    # print(self.mapToScene(event.pos()))
                     menu.popup((self.mapToGlobal(event.pos())))
 
             # self.rightButtonPressed = True
