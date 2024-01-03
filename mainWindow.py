@@ -1,4 +1,5 @@
 from PyQt5.QtCore import Qt, pyqtSlot
+from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit, QMenu, QWidget, \
     QHBoxLayout, QAction, QFormLayout, QLabel
 
@@ -88,10 +89,18 @@ class MainWindow(QMainWindow):
             self.newLineBtn.clicked.connect(self.addLine)
             editVariablesBtn = QPushButton("Edit variables", self)
             editVariablesBtn.clicked.connect(self.openVariableTable)
+
+            self.labell = QLabel()
+
+            onlyInt = QIntValidator()
+            self.capacityValue = QLineEdit()
+            self.capacityValue.setValidator(onlyInt)
+            self.capacityValue.editingFinished.connect(self.setPlaceCapacity)
+            self.verticalLayout.addWidget(self.capacityValue)
+
             self.verticalLayout.addWidget(editVariablesBtn)
             self.verticalLayout.addWidget(self.newLineBtn)
             self.verticalLayout.setAlignment(Qt.AlignTop)
-            self.labell = QLabel()
         else:
             for i in self.linesArray:
                 self.removeLine(i[0], i[1], i[2])
@@ -126,6 +135,10 @@ class MainWindow(QMainWindow):
         btn.deleteLater()
         line.setParent(None)
 
+
+    def setPlaceCapacity(self):
+        # print(self.capacityValue.text())
+        self.activeItem.setCapacity(self.capacityValue.text())
 
     def setActiveItem(self, a):
         if a is not None:

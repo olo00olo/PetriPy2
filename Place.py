@@ -35,12 +35,17 @@ class Place(Node):
         #     self.capacity()
 
     def capacity(self):
+        print(self.capacityValue)
+        self.capacityValue = int(self.capacityValue)
         if self.capacityValue > 1:
-            self.capacityTextItem = QGraphicsTextItem("0", self)
+            self.capacityTextItem = QGraphicsTextItem(str(self.capacityValue), self)
             self.capacityTextItem.setPos(-7, -15)
-            self.capacityValue = 0
             self.fractionLine = QGraphicsTextItem(chr(95), self)
             self.fractionLine.setPos(-7, -15)
+
+    def setCapacity(self, value):
+        self.capacityValue = value
+        self.capacity()
 
     def addVariable(self, edit, variable):
         print(edit, variable, "VAR")
