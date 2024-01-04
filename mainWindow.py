@@ -3,9 +3,11 @@ from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit, QMenu, QWidget, \
     QHBoxLayout, QAction, QFormLayout, QLabel
 
+from Edge import Edge
+from Place import Place
 from Saver import saver
+from Transition import Transition
 from VariableWindow import TableWindow
-
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -84,33 +86,82 @@ class MainWindow(QMainWindow):
 
 
     def placeEditor(self):
-        if self.activeItem is not None:
-            self.newLineBtn = QPushButton("+", self)
-            self.newLineBtn.clicked.connect(self.addLine)
+        if self.activeItem is not None and isinstance(self.activeItem, Place):
+            # self.newLineBtn = QPushButton("+", self)
+            # self.newLineBtn.clicked.connect(self.addLine)
             editVariablesBtn = QPushButton("Edit variables", self)
             editVariablesBtn.clicked.connect(self.openVariableTable)
 
             self.labell = QLabel()
 
             onlyInt = QIntValidator()
+            onlyInt.setRange(1, 9)
+
+            self.capacityLabel = QLabel()
+            self.capacityLabel.setText("Capacity: ")
             self.capacityValue = QLineEdit()
             self.capacityValue.setValidator(onlyInt)
             self.capacityValue.editingFinished.connect(self.setPlaceCapacity)
-            self.verticalLayout.addWidget(self.capacityValue)
+            self.f1 = QFormLayout()
+            self.f1.addRow(self.capacityLabel, self.capacityValue)
 
+            self.tokenLabel = QLabel()
+            self.tokenLabel.setText("Token: ")
+            self.tokenValue = QLineEdit()
+            self.tokenValue.setValidator(onlyInt)
+            self.tokenValue.editingFinished.connect(self.setPlaceToken)
+            self.f2 = QFormLayout()
+            self.f2.addRow(self.tokenLabel, self.tokenValue)
+
+            self.verticalLayout.addLayout(self.f2)
+            self.verticalLayout.addLayout(self.f1)
             self.verticalLayout.addWidget(editVariablesBtn)
-            self.verticalLayout.addWidget(self.newLineBtn)
+            # self.verticalLayout.addWidget(self.newLineBtn)
             self.verticalLayout.setAlignment(Qt.AlignTop)
-        else:
-            for i in self.linesArray:
-                self.removeLine(i[0], i[1], i[2])
-                self.linesArray = []
-            for i in reversed(range(self.verticalLayout.count())):
-                self.verticalLayout.itemAt(i).widget().setParent(None)
 
-            self.labell = QLabel("None item selected")
-            self.verticalLayout.addWidget(self.labell)
-            print("n")
+        elif self.activeItem is not None and isinstance(self.activeItem, Edge):
+            self.labell = QLabel()
+
+            onlyInt = QIntValidator()
+            onlyInt.setRange(1, 9)
+            self.weightLabel = QLabel()
+            self.weightLabel.setText("Weight: ")
+            self.weightValue = QLineEdit()
+            self.weightValue.setValidator(onlyInt)
+            self.weightValue.editingFinished.connect(self.setArcWeight)
+
+            self.f1 = QFormLayout()
+            self.f1.addRow(self.weightLabel, self.weightValue)
+
+            self.verticalLayout.addLayout(self.f1)
+            self.verticalLayout.setAlignment(Qt.AlignTop)
+
+            print("111")
+
+
+
+        else:
+            try:
+                # for i in self.linesArray:
+                #     self.removeLine(i[0], i[1], i[2])
+                #     self.linesArray = []
+                for i in reversed(range(self.verticalLayout.count())):
+                    widget = self.verticalLayout.itemAt(i).widget()
+                    if widget is not None:
+                        widget.setParent(None)
+                for i in reversed(range(self.f1.count())):
+                    widget = self.f1.itemAt(i).widget()
+                    if widget is not None:
+                        widget.setParent(None)
+                for i in reversed(range(self.f2.count())):
+                    widget = self.f2.itemAt(i).widget()
+                    if widget is not None:
+                        widget.setParent(None)
+
+                self.labell = QLabel("None item selected")
+                self.verticalLayout.addWidget(self.labell)
+            except:
+                print("XD")
 
     def openVariableTable(self):
         self.a = TableWindow(self.activeItem)
@@ -135,15 +186,32 @@ class MainWindow(QMainWindow):
         btn.deleteLater()
         line.setParent(None)
 
+    def setArcWeight(self):
+        print(self.activeItem)
+        self.activeItem.setWeight(self.weightValue.text())
+
 
     def setPlaceCapacity(self):
         # print(self.capacityValue.text())
         self.activeItem.setCapacity(self.capacityValue.text())
 
+    def setPlaceToken(self):
+        # print(self.capacityValue.text())
+        self.activeItem.setToken(self.tokenValue.text())
+
     def setActiveItem(self, a):
-        if a is not None:
+        if a is not None and isinstance(a, Place):
             self.activeItem = a
             self.labell.setText("P" + str(a.id))
+
+        elif a is not None and isinstance(a, Transition):
+            self.activeItem = a
+            self.labell.setText("T" + str(a.id))
+
+        elif a is not None and isinstance(a, Edge):
+            self.activeItem = a
+            self.labell.setText("A" + str(a.id))
+
         else:
             self.activeItem = None
             self.labell.setText("None item selected")

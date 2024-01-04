@@ -20,32 +20,60 @@ class Place(Node):
         self.capacityValue = 1
         self.variables = {"x": bool(1), "y": bool(0)}
 
-        self.tokens = (self.tokens)
+        # self.tokens = (self.tokens)
 
         self.labels()
-        self.token()
+
+        self.tokensInit()
+        # self.token()
+
+        self.capacityInit()
         self.capacity()
 
         self.active = False
 
+
+
+
+    def tokensInit(self):
+        self.tokenTextItem = QGraphicsTextItem(str(self.tokens), self)
+        self.tokenTextItem.hide()
+
+    def capacityInit(self):
+        self.capacityTextItem = QGraphicsTextItem(str(self.capacityValue), self)
+
+        # self.capacityTextItem.setPos(-7, -5)
+        self.fractionLine = QGraphicsTextItem(chr(95), self)
+
     def token(self):
-        self.tokenTextItem = QGraphicsTextItem("0", self)
-        self.tokenTextItem.setPos(-7, -11)
+        self.tokenTextItem.setPlainText(str(self.tokens))
         # if self.tokens > 1:
         #     self.capacity()
 
+
     def capacity(self):
-        print(self.capacityValue)
         self.capacityValue = int(self.capacityValue)
+        self.fractionLine.hide()
+        self.capacityTextItem.hide()
+        self.tokenTextItem.hide()
+        self.capacityTextItem.setPos(-7, -11)
         if self.capacityValue > 1:
-            self.capacityTextItem = QGraphicsTextItem(str(self.capacityValue), self)
-            self.capacityTextItem.setPos(-7, -15)
-            self.fractionLine = QGraphicsTextItem(chr(95), self)
+            self.fractionLine.show()
+            self.capacityTextItem.show()
+            self.tokenTextItem.show()
+
+            self.tokenTextItem.setPos(-7, -15)
             self.fractionLine.setPos(-7, -15)
+            self.capacityTextItem.setPos(-7, -5)
+            self.capacityTextItem.setPlainText(str(self.capacityValue))
 
     def setCapacity(self, value):
         self.capacityValue = value
         self.capacity()
+
+    def setToken(self, value):
+        self.tokens = value
+        self.token()
 
     def addVariable(self, edit, variable):
         print(edit, variable, "VAR")

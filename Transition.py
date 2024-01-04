@@ -21,7 +21,6 @@ class Transition(Node):
         self.labels()
 
         self.active = False
-        print(self.inArcs)
 
     def labels(self):
         text = str(self.id)
@@ -34,6 +33,9 @@ class Transition(Node):
         path.addRect(-10, -10, 20, 20)
         return path
 
+    def setActivated(self, bool):
+        self.active = bool
+        self.update()
     def paint(self, painter, option, widget):
         painter.setPen(Qt.NoPen)
         painter.drawRect(-7, -7, 20, 20)

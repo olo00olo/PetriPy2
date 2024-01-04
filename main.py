@@ -1,13 +1,15 @@
 import json
 import math
+import PyQt5
 
 from PyQt5.QtCore import (QRectF, Qt, pyqtSignal)
 from PyQt5.QtGui import (QPainter)
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
-                             QGraphicsView, QPushButton, QMessageBox, QMenu, QAction)
+                             QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QDialog)
 
 from Edge import Edge
 from Loader import loader
+from Matrix import Matrix
 from NewArc import NewArc
 from Place import Place
 from Transition import Transition
@@ -130,6 +132,13 @@ class GraphWidget(QGraphicsView):
         #     element.setActivated(False)
         # key = event.key()
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Q:
+            self.a = Matrix(self)
+            # a.setGeometry(100, 100, 800, 600)
+            self.a.show()
+        # event.accept()
+
     def deleteItem(self, item):
         self.scene.removeItem(item)
 
@@ -172,7 +181,7 @@ class GraphWidget(QGraphicsView):
                 itemClicked = 0
 
                 for item in items:
-                    if isinstance(item, (Transition, Place)) and item.active is False:
+                    if isinstance(item, (Transition, Place, Edge)) and item.active is False:
                         if self.activeElement is not None and item is not self.activeElement:
                             self.activeElement.setActivated(False)
                             self.activeElementChanged.emit(None)
@@ -185,6 +194,7 @@ class GraphWidget(QGraphicsView):
                         # self.activeElement.active = False
                         self.activeElement = None
                         self.activeElementChanged.emit(None)
+
 
                         # self.activeElements.remove(item)
 
@@ -228,6 +238,7 @@ class GraphWidget(QGraphicsView):
                 if error == 0:
                     if destination is not None:
                         ne = Edge(source, destination)
+
                         self.scene.addItem(ne)
                         newArc = []
                         newArc.append(ne)

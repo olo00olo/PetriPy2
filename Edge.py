@@ -3,7 +3,7 @@ import math
 
 from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QSizeF
 from PyQt5.QtGui import QPen, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsTextItem
 
 
 class Edge(QGraphicsItem):
@@ -20,6 +20,9 @@ class Edge(QGraphicsItem):
         self.id = Edge.counter
         Edge.counter += 1
 
+        self.weightValue = 1
+        self.weightInit()
+
         self.arrowSize = 6.0
         self.sourcePoint = QPointF()
         self.destPoint = QPointF()
@@ -31,6 +34,29 @@ class Edge(QGraphicsItem):
         self.dest.addEdge(self)
         self.adjust()
 
+        self.active = False
+
+
+
+    def setActivated(self, bool):
+
+        self.active = bool
+        self.update()
+
+    def weightInit(self):
+        self.weightTextItem = QGraphicsTextItem(str(self.weightValue), self)
+
+
+    def weight(self):
+        self.weightValue = int(self.weightValue)
+
+        self.weightTextItem.setPlainText(str(self.weightValue))
+        # self.weightTextItem.setPos(0, -50)
+        print("222")
+
+    def setWeight(self, value):
+        self.weightValue = value
+        self.weight()
     def type(self):
         return Edge.Type
 
@@ -72,7 +98,7 @@ class Edge(QGraphicsItem):
         if not self.source or not self.dest:
             return
 
-        self.findNearest()
+        # self.findNearest()
         line = self.findNearest()
 
         # line = QLineF(self.mapFromItem(self.source, 0, 0),
@@ -93,6 +119,8 @@ class Edge(QGraphicsItem):
         else:
             self.sourcePoint = line.p1()
             self.destPoint = line.p1()
+
+        self.weightTextItem.setPos(line.center())
 
     def boundingRect(self):
         if not self.source or not self.dest:
