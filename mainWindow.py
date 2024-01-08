@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit, QMenu, QWidget, \
-    QHBoxLayout, QAction, QFormLayout, QLabel
+    QHBoxLayout, QAction, QFormLayout, QLabel, QMessageBox
 
 from Edge import Edge
 from Place import Place
@@ -100,6 +100,7 @@ class MainWindow(QMainWindow):
             self.capacityLabel = QLabel()
             self.capacityLabel.setText("Capacity: ")
             self.capacityValue = QLineEdit()
+            self.capacityValue.setText(str(self.activeItem.capacityValue))
             self.capacityValue.setValidator(onlyInt)
             self.capacityValue.editingFinished.connect(self.setPlaceCapacity)
             self.f1 = QFormLayout()
@@ -108,6 +109,7 @@ class MainWindow(QMainWindow):
             self.tokenLabel = QLabel()
             self.tokenLabel.setText("Token: ")
             self.tokenValue = QLineEdit()
+            self.tokenValue.setText(str(self.activeItem.tokens))
             self.tokenValue.setValidator(onlyInt)
             self.tokenValue.editingFinished.connect(self.setPlaceToken)
             self.f2 = QFormLayout()
@@ -127,6 +129,7 @@ class MainWindow(QMainWindow):
             self.weightLabel = QLabel()
             self.weightLabel.setText("Weight: ")
             self.weightValue = QLineEdit()
+            self.weightValue.setText(str(self.activeItem.weightValue))
             self.weightValue.setValidator(onlyInt)
             self.weightValue.editingFinished.connect(self.setArcWeight)
 
@@ -164,9 +167,15 @@ class MainWindow(QMainWindow):
                 print("XD")
 
     def openVariableTable(self):
-        self.a = TableWindow(self.activeItem)
-        # a.setGeometry(100, 100, 800, 600)
-        self.a.show()
+        if isinstance(self.activeItem, Place):
+            if self.activeItem.capacityValue == 1:
+                self.a = TableWindow(self.activeItem)
+                # a.setGeometry(100, 100, 800, 600)
+                self.a.show()
+            else:
+                msgBox = QMessageBox()
+                msgBox.information(self, "Information", "Can't open variable editor if capacity is greater than 0")
+
 
     def addLine(self):
         # variableWindow = TableWindow()
@@ -193,7 +202,13 @@ class MainWindow(QMainWindow):
 
     def setPlaceCapacity(self):
         # print(self.capacityValue.text())
-        self.activeItem.setCapacity(self.capacityValue.text())
+        # print(self.capacityValue)
+        if bool(self.activeItem.variables):
+            msgBox = QMessageBox()
+            msgBox.information(self, "Information", "Can't change capacity if any variable exist")
+        else:
+            self.activeItem.setCapacity(self.capacityValue.text())
+
 
     def setPlaceToken(self):
         # print(self.capacityValue.text())

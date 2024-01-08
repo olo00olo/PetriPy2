@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainterPath, QRadialGradient, QColor, QBrush, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QStyle, QGraphicsTextItem
+from PyQt5.QtWidgets import QGraphicsItem, QStyle, QGraphicsTextItem, QFormLayout, QLineEdit
 
 from Node import Node
 
@@ -8,7 +8,7 @@ import itertools
 
 class Place(Node):
     # Type = QGraphicsItem.UserType + 1
-    counter = 0
+    counter = 1
 
     def __init__(self, graphWidget):
         super().__init__(graphWidget)
@@ -18,7 +18,13 @@ class Place(Node):
 
         self.tokens = 0
         self.capacityValue = 1
-        self.variables = {"x": bool(1), "y": bool(0)}
+        self.variables = {}
+        # self.variables = {"x": bool(1), "y": bool(0)}
+        # self.variables = {"x": bool(1)}
+
+        self.label = QGraphicsTextItem("", self)
+
+
 
         # self.tokens = (self.tokens)
 
@@ -31,6 +37,10 @@ class Place(Node):
         self.capacity()
 
         self.active = False
+
+        self.variablesTextItems = []
+        self.variablesPrint()
+
 
 
 
@@ -47,8 +57,28 @@ class Place(Node):
 
     def token(self):
         self.tokenTextItem.setPlainText(str(self.tokens))
-        # if self.tokens > 1:
-        #     self.capacity()
+        # if self.tokens == 1 and self.capacityValue == 1:
+
+
+    def variablesPrint(self):
+        print(self.variables)
+        posOffset = 0
+
+        for v in self.variablesTextItems:
+            v.deleteLater()
+        self.variablesTextItems = []
+
+        for key, value in self.variables.items():
+            self.var = QGraphicsTextItem(str(key) + ":", self)
+            self.var.setPos(0, posOffset)
+            self.variablesTextItems.append(self.var)
+
+            self.varValue = QGraphicsTextItem(str(int(value)), self)
+            self.varValue.setPos(12, posOffset)
+            self.variablesTextItems.append(self.varValue)
+            posOffset += 10
+
+
 
 
     def capacity(self):
@@ -80,6 +110,7 @@ class Place(Node):
 
     def setId(self, id):
         self.id = id
+        self.labels()
         # print(self.id)
 
     def setActivated(self, bool):
@@ -89,7 +120,7 @@ class Place(Node):
     def labels(self):
         text = str(self.id)
         text = "P" + text
-        self.label = QGraphicsTextItem(text, self)
+        self.label.setPlainText(text)
         self.label.setPos(-20, -25)
 
     def shape(self):

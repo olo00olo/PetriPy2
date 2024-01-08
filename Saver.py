@@ -5,7 +5,8 @@ from PyQt5.QtWidgets import QFileDialog
 from Place import Place
 
 
-def saver(graphWidget):
+def saver(graphWidget, mode):
+
     print("saver init")
     i = 1
     placesDict = {}
@@ -16,6 +17,9 @@ def saver(graphWidget):
     for placeId, placeRef in graphWidget.placesDict.items():
         placesDict.update({"id": placeId})
         placesDict.update({"pos": [round(placeRef.x(), 2), round(placeRef.y(), 2)]})
+        placesDict.update({"tokens": int(placeRef.tokens)})
+        placesDict.update({"capacity": int(placeRef.capacityValue)})
+        placesDict.update({"variables": placeRef.variables})
         all["places"].update({i: placesDict})
         placesDict = {}
         i += 1
@@ -41,16 +45,21 @@ def saver(graphWidget):
                 arcsDict.update({"P": key})
             else:
                 arcsDict.update({"T": key})
+        arcsDict.update({"weight": arcRef[0].weightValue})
+        arcsDict.update({"id": arcRef[0].id})
 
         all["arcs"].update({i: arcsDict})
         arcsDict = {}
         i += 1
 
-    filename = QFileDialog.getSaveFileName(graphWidget, 'Select file', '*.json')
-    path = filename[0]
+    if mode == "file":
+        filename = QFileDialog.getSaveFileName(graphWidget, 'Select file', '*.json')
+        path = filename[0]
 
-    try:
-        with open(path, 'w') as convert_file:
-            convert_file.write(json.dumps(all))
-    except:
-        print("Couldn't open file")
+        try:
+            with open(path, 'w') as convert_file:
+                convert_file.write(json.dumps(all))
+        except:
+            print("Couldn't open file")
+    else:
+        return json.dumps(all)

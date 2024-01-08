@@ -12,7 +12,7 @@ class Edge(QGraphicsItem):
 
     Type = QGraphicsItem.UserType + 2
 
-    counter = 0
+    counter = 1
 
     def __init__(self, sourceNode, destNode):
         super(Edge, self).__init__()
@@ -37,6 +37,8 @@ class Edge(QGraphicsItem):
         self.active = False
 
 
+    def setId(self, value):
+        self.id = value
 
     def setActivated(self, bool):
 

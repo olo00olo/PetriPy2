@@ -10,7 +10,7 @@ from Node import Node
 class Transition(Node):
     Type = QGraphicsItem.UserType + 1
 
-    counter = 0
+    counter = 1
 
     def __init__(self, graphWidget):
         super().__init__(graphWidget)
@@ -18,14 +18,21 @@ class Transition(Node):
         self.id = Transition.counter
         Transition.counter += 1
 
+        self.label = QGraphicsTextItem("text", self)
+
+
         self.labels()
 
         self.active = False
 
+    def setId(self, id):
+        self.id = id
+        self.labels()
+
     def labels(self):
         text = str(self.id)
         text = "T" + text
-        self.label = QGraphicsTextItem(text, self)
+        self.label.setPlainText(text)
         self.label.setPos(-20, -25)
 
     def shape(self):

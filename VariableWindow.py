@@ -94,6 +94,12 @@ class TableWindow(QDialog):
         # Aktualizuj rozmiar okna po usunięciu wiersza
         self.resize(self.table.horizontalHeader().length() + 20, self.table.verticalHeader().length() + 50)
 
+        for r in range(self.table.rowCount()):
+            remove_button = self.table.cellWidget(r, 2)
+            if remove_button:
+                remove_button.clicked.disconnect()
+                remove_button.clicked.connect(lambda state, row=r: self.remove_row(row))
+
     def apply_changes(self):
         newVarDict = {}
         for row in range(self.table.rowCount()):
@@ -114,8 +120,11 @@ class TableWindow(QDialog):
                         else:
                             state = bool(1)
                     newVarDict.update({var: state})
-        if newVarDict:
-            self.item.variables.update(newVarDict)
+        # if newVarDict:
+        print(newVarDict)
+        # self.item.variables.update(newVarDict)
+        self.item.variables = newVarDict
+        self.item.variablesPrint()
 
 # if __name__ == '__main__':
 #     app = QApplication(sys.argv)

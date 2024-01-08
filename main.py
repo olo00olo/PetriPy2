@@ -1,20 +1,18 @@
-import json
 import math
-import PyQt5
 
-from PyQt5.QtCore import (QRectF, Qt, pyqtSignal)
-from PyQt5.QtGui import (QPainter)
+from PyQt5.QtCore import (QRectF, Qt, pyqtSignal, pyqtSlot)
+from PyQt5.QtGui import (QPainter, QKeySequence)
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
-                             QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QDialog)
+                             QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QShortcut)
 
 from Edge import Edge
 from Loader import loader
 from Matrix import Matrix
 from NewArc import NewArc
 from Place import Place
-from Transition import Transition
-from mainWindow import MainWindow
 from Saver import saver
+from Simulator import Simulator
+from Transition import Transition
 
 
 class GraphWidget(QGraphicsView):
@@ -46,7 +44,7 @@ class GraphWidget(QGraphicsView):
         self.addPlaceBtn.move(5, 5)
         self.addPlaceBtn.setCheckable(True)
         self.addPlaceBtn.clicked.connect(self.setActiveButton)
-        # self.addPlaceBtn.setShortcut("Ctrl+Z")
+
 
         self.addTransitionBtn = QPushButton("add transition", self)
         self.addTransitionBtn.move(155, 5)
@@ -60,7 +58,17 @@ class GraphWidget(QGraphicsView):
 
         self.saveNetButton = QPushButton("save net", self)
         self.saveNetButton.move(455, 5)
-        self.saveNetButton.clicked.connect(lambda: saver(self))
+        self.saveNetButton.clicked.connect(lambda: saver(self, "file"))
+
+
+        undoShortcut = QShortcut(QKeySequence('Ctrl+Z'), self)
+        undoShortcut.activated.connect(self.undo)
+
+        redoShortcut = QShortcut(QKeySequence('Ctrl+Y'), self)
+        redoShortcut.activated.connect(self.redo)
+
+        self.undoHeap = ['{"places": {}, "transitions": {}, "arcs": {}}']
+        self.redoHeap = [{}]
 
         self.scale(1.8, 1.8)
         self.setMinimumSize(400, 400)
@@ -82,6 +90,13 @@ class GraphWidget(QGraphicsView):
         self.activeState = 0
         self.activeElements = []
         self.activeElement = None
+
+        self.matrix = Matrix(self)
+        self.simulator = Simulator(self)
+
+        # loader(self, "file")
+
+        self.simulator.trigger.connect(self.costam)
 
     def setActiveButton(self):
         self.n.reset()
@@ -113,11 +128,21 @@ class GraphWidget(QGraphicsView):
     #         # self.activeElements.remove(element)
 
     def saveNet(self):
-        saver(self)
+        saver(self, "file")
 
     def loadNet(self):
-        loader(self)
+        loader(self, 'file')
 
+
+    def undo(self):
+        if len(self.undoHeap) > 1:
+            loader(self, self.undoHeap[-2])
+            self.redoHeap.append(self.undoHeap[-1])
+            self.undoHeap.pop(-1)
+
+    def redo(self):
+        loader(self, self.redoHeap[-1])
+        pass
 
     # def keyPressEvent(self, event):
         # print(self.activeElement.active)
@@ -134,10 +159,48 @@ class GraphWidget(QGraphicsView):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Q:
-            self.a = Matrix(self)
+            # self.a = Matrix(self)
+            pass
             # a.setGeometry(100, 100, 800, 600)
-            self.a.show()
-        # event.accept()
+
+        #one step
+        if event.key() == Qt.Key_Space:
+            self.matrix.combo()
+            mNew = self.matrix.mNew
+
+            counter = 0
+            for key, value in self.placesDict.items():
+                value.setToken(mNew[counter])
+                counter += 1
+
+            self.matrix.show()
+
+        #start sim
+        if event.key() == Qt.Key_W:
+            self.simulator.start_simulation()
+
+        #stop sim
+        if event.key() == Qt.Key_S:
+            self.simulator.stop_simulation()
+
+        #faster
+        if event.key() == Qt.Key_D:
+            self.simulator.time += 1000
+
+        #slower
+        if event.key() == Qt.Key_A:
+            self.simulator.time -= 1000
+
+
+    @pyqtSlot()
+    def costam(self):
+        self.matrix.combo()
+        mNew = self.matrix.mNew
+
+        counter = 0
+        for key, value in self.placesDict.items():
+            value.setToken(mNew[counter])
+            counter += 1
 
     def deleteItem(self, item):
         self.scene.removeItem(item)
@@ -162,8 +225,6 @@ class GraphWidget(QGraphicsView):
             (next(iter(self.arcsDict[item.id][1].values()))).outArcs.pop(item.id)
             (next(iter(self.arcsDict[item.id][2].values()))).inArcs.pop(item.id)
             self.arcsDict.pop(item.id)
-
-
 
     # def start(self, obj):
     #
@@ -214,6 +275,12 @@ class GraphWidget(QGraphicsView):
                 self.scene.addItem(newPlace)
                 self.places.append(newPlace)
                 self.placesDict.update({newPlace.id: newPlace})
+
+
+
+                self.undoHeap.append(saver(self, "heap"))
+                print(self.undoHeap)
+                print(len(self.undoHeap))
                 # print(self.placesDict)
 
             # add transition
@@ -223,6 +290,8 @@ class GraphWidget(QGraphicsView):
                 self.scene.addItem(newTransition)
                 self.transitions.append(newTransition)
                 self.transitionsDict.update({newTransition.id: newTransition})
+
+                self.undoHeap.append(saver(self, "heap"))
 
             # add arc
             if self.activeState == 3:
@@ -250,6 +319,9 @@ class GraphWidget(QGraphicsView):
                         self.arcs.append(newArc)
                         self.n.reset()
 
+                        self.undoHeap.append(saver(self, "heap"))
+
+
                 elif error == 1:
                     self.n.reset()
                     msgBox = QMessageBox()
@@ -263,10 +335,12 @@ class GraphWidget(QGraphicsView):
         elif event.button() == Qt.MouseButton.RightButton:
             for item in items:
                 if isinstance(item, (Transition, Place, Edge)):
-                    print(item.id, item.variables)
-
+                    print("XDD")
+                    # print(item.id, item.variables)
                     menu = QMenu(self)
                     deleteItem = QAction('Delete', self)
+                    print("XDDD")
+
                     deleteItem.triggered.connect(lambda: self.deleteItem(item))
                     menu.addAction(deleteItem)
                     # print(self.mapToScene(event.pos()))
