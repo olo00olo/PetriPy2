@@ -13,54 +13,57 @@ def loader(graphWidget, mode):
     places = {}
     transitions = {}
 
+    maxArcId = 0
     if mode == "file":
         # filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
         # path = filename[0]
 
-        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\test.json'
-
-        maxArcId = 0
+        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\3.json'
 
         convert_file = open(path, 'r')
-        print(convert_file)
+        convert_file = convert_file.read()
         # with open(path, 'r') as convert_file:
 
     else:
         convert_file = mode
 
     try:
-        Place.counter = 0
-        Transition.counter = 0
-        Edge.counter = 0
+        Place.counter = 1
+        Transition.counter = 1
+        Edge.counter = 1
 
         graphWidget.scene.clear()
 
-        print("XD")
+        graphWidget.placesDict = {}
+        graphWidget.transitionsDict = {}
+        graphWidget.arcsDict = {}
+
+
+
         net = json.loads(convert_file)
-        print("2222")
 
         for key, place in net["places"].items():
-            print("3")
             newPlace = Place(graphWidget)
             newPlace.setPos(place['pos'][0], place['pos'][1])
             newPlace.setId(place['id'])
             newPlace.setToken(place['tokens'])
             newPlace.setCapacity(place['capacity'])
             newPlace.variables = place['variables']
+            newPlace.variablesPrint()
 
             graphWidget.scene.addItem(newPlace)
             places.update({place['id']: newPlace})
             graphWidget.placesDict.update({newPlace.id: newPlace})
-            print(graphWidget.placesDict)
 
             Place.counter = newPlace.id + 1
-
+        print(graphWidget.placesDict, "loader")
 
         for key, transition in net["transitions"].items():
             newTransition = Transition(graphWidget)
             newTransition.setPos(transition['pos'][0], transition['pos'][1])
 
             newTransition.setId(transition['id'])
+            newTransition.setVariables(transition['var'])
 
             graphWidget.scene.addItem(newTransition)
             transitions.update({transition['id']: newTransition})
@@ -68,7 +71,9 @@ def loader(graphWidget, mode):
 
             Transition.counter = newTransition.id + 1
 
+
         for key, value in net['arcs'].items():
+
             if next(iter(value)) == 'P':
                 source = places[int(value['P'])]
                 # print(source.id, "source")
@@ -87,6 +92,7 @@ def loader(graphWidget, mode):
                 arc.append({destination.id: destination})
                 graphWidget.arcsDict.update({value["id"]: arc})
                 source.outArcs.update({value["id"]: arc})
+
                 destination.inArcs.update({value["id"]: arc})
 
                 if value["id"] > maxArcId:

@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
                              QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QShortcut)
 
 from Edge import Edge
+from InitialVariables import InitialVariables
 from Loader import loader
 from Matrix import Matrix
 from NewArc import NewArc
@@ -68,7 +69,7 @@ class GraphWidget(QGraphicsView):
         redoShortcut.activated.connect(self.redo)
 
         self.undoHeap = ['{"places": {}, "transitions": {}, "arcs": {}}']
-        self.redoHeap = [{}]
+        self.redoHeap = []
 
         self.scale(1.8, 1.8)
         self.setMinimumSize(400, 400)
@@ -96,7 +97,10 @@ class GraphWidget(QGraphicsView):
 
         # loader(self, "file")
 
+        self.variableDict = {}
         self.simulator.trigger.connect(self.costam)
+
+        self.initVariables = InitialVariables(self)
 
     def setActiveButton(self):
         self.n.reset()
@@ -131,18 +135,22 @@ class GraphWidget(QGraphicsView):
         saver(self, "file")
 
     def loadNet(self):
+        self.undoHeap = []
+        self.redoHeap = []
         loader(self, 'file')
 
 
     def undo(self):
         if len(self.undoHeap) > 1:
-            loader(self, self.undoHeap[-2])
             self.redoHeap.append(self.undoHeap[-1])
             self.undoHeap.pop(-1)
+            loader(self, self.undoHeap[-1])
 
     def redo(self):
-        loader(self, self.redoHeap[-1])
-        pass
+        if self.redoHeap:
+            self.undoHeap.append(self.redoHeap[-1])
+            loader(self, self.redoHeap[-1])
+            self.redoHeap.pop(-1)
 
     # def keyPressEvent(self, event):
         # print(self.activeElement.active)
@@ -157,6 +165,10 @@ class GraphWidget(QGraphicsView):
         #     element.setActivated(False)
         # key = event.key()
 
+    def showMatrix(self):
+        self.matrix.combo()
+        self.matrix.show()
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Q:
             # self.a = Matrix(self)
@@ -165,15 +177,19 @@ class GraphWidget(QGraphicsView):
 
         #one step
         if event.key() == Qt.Key_Space:
+
             self.matrix.combo()
             mNew = self.matrix.mNew
+            print("asdasdasda1")
 
             counter = 0
             for key, value in self.placesDict.items():
                 value.setToken(mNew[counter])
                 counter += 1
 
-            self.matrix.show()
+            # self.matrix.show()
+
+            self.matrix.refresh()
 
         #start sim
         if event.key() == Qt.Key_W:
@@ -191,6 +207,14 @@ class GraphWidget(QGraphicsView):
         if event.key() == Qt.Key_A:
             self.simulator.time -= 1000
 
+    #     if event.key() == Qt.Key_E:
+    #         self.showVariables()
+    #
+    #
+    #
+    # def showVariables(self):
+    #     self.initVariables.updateVariables()
+    #     self.initVariables.show()
 
     @pyqtSlot()
     def costam(self):
@@ -207,6 +231,7 @@ class GraphWidget(QGraphicsView):
 
         if isinstance(item, Place):
             self.placesDict.pop(item.id)
+            self.showVariables()
         elif isinstance(item, Transition):
             self.transitionsDict.pop(item.id)
 
@@ -277,11 +302,10 @@ class GraphWidget(QGraphicsView):
                 self.placesDict.update({newPlace.id: newPlace})
 
 
-
+                # print(self.undoHeap)
                 self.undoHeap.append(saver(self, "heap"))
-                print(self.undoHeap)
-                print(len(self.undoHeap))
-                # print(self.placesDict)
+                self.redoHeap = []
+                # print(self.undoHeap)
 
             # add transition
             if self.activeState == 2:
@@ -292,6 +316,8 @@ class GraphWidget(QGraphicsView):
                 self.transitionsDict.update({newTransition.id: newTransition})
 
                 self.undoHeap.append(saver(self, "heap"))
+                self.redoHeap = []
+
 
             # add arc
             if self.activeState == 3:
@@ -320,6 +346,8 @@ class GraphWidget(QGraphicsView):
                         self.n.reset()
 
                         self.undoHeap.append(saver(self, "heap"))
+                        self.redoHeap = []
+
 
 
                 elif error == 1:
@@ -335,11 +363,9 @@ class GraphWidget(QGraphicsView):
         elif event.button() == Qt.MouseButton.RightButton:
             for item in items:
                 if isinstance(item, (Transition, Place, Edge)):
-                    print("XDD")
                     # print(item.id, item.variables)
                     menu = QMenu(self)
                     deleteItem = QAction('Delete', self)
-                    print("XDDD")
 
                     deleteItem.triggered.connect(lambda: self.deleteItem(item))
                     menu.addAction(deleteItem)

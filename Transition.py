@@ -25,6 +25,9 @@ class Transition(Node):
 
         self.active = False
 
+        self.variables = ""
+        self.variablesTextItem = QGraphicsTextItem("", self)
+
     def setId(self, id):
         self.id = id
         self.labels()
@@ -43,6 +46,11 @@ class Transition(Node):
     def setActivated(self, bool):
         self.active = bool
         self.update()
+
+    def setVariables(self, s):
+        self.variables = s
+        self.variablesTextItem.setPlainText(s)
+        print(self.variables)
     def paint(self, painter, option, widget):
         painter.setPen(Qt.NoPen)
         painter.drawRect(-7, -7, 20, 20)

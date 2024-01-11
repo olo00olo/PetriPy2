@@ -4,14 +4,24 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidget, QTableWidge
     QPushButton, QComboBox, QDialog, QMessageBox
 import sys
 
+from Saver import saver
+
+
 class TableWindow(QDialog):
-    def __init__(self, item):
+    def __init__(self, item, m, mainWindow):
         super().__init__()
 
         self.item = item
         self.prevVarDict = self.item.variables
 
         self.init_ui()
+
+        self.m = m
+        self.mainWindow = mainWindow
+
+        self.removeQueue = []
+
+
     def init_ui(self):
         # self.setWindowTitle("Table Window")
         #
@@ -35,7 +45,7 @@ class TableWindow(QDialog):
                     self.table.setCellWidget(self.i, col, combo_box)
                 else:
                     item = QTableWidgetItem(key)
-                    print(key, type(key))
+                    # print(key, type(key))
                     self.table.setItem(self.i, col, item)
 
             # Dodaj przycisk usuwania w trzeciej kolumnie
@@ -89,10 +99,12 @@ class TableWindow(QDialog):
         # self.resize(self.table.horizontalHeader().length() + 20, self.table.verticalHeader().length() + 50)
 
     def remove_row(self, row):
+        # self.removeQueue.append(self.table.item(row, 0).text())
+
         self.table.removeRow(row)
 
         # Aktualizuj rozmiar okna po usunięciu wiersza
-        self.resize(self.table.horizontalHeader().length() + 20, self.table.verticalHeader().length() + 50)
+        # self.resize(self.table.horizontalHeader().length() + 20, self.table.verticalHeader().length() + 50)
 
         for r in range(self.table.rowCount()):
             remove_button = self.table.cellWidget(r, 2)
@@ -120,11 +132,20 @@ class TableWindow(QDialog):
                         else:
                             state = bool(1)
                     newVarDict.update({var: state})
-        # if newVarDict:
-        print(newVarDict)
-        # self.item.variables.update(newVarDict)
+                    print("XDDDDDDDDD")
+
+                    # self.m.showVariables()
+
+
+                    # self.m.variables.append(var)
+
         self.item.variables = newVarDict
         self.item.variablesPrint()
+
+        self.mainWindow.dock_variables.refresh_values()
+
+        self.m.undoHeap.append(saver(self.m, "heap"))
+        self.m.redoHeap = []
 
 # if __name__ == '__main__':
 #     app = QApplication(sys.argv)

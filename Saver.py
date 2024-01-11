@@ -14,6 +14,7 @@ def saver(graphWidget, mode):
     arcsDict = {}
     all = {"places": {}, "transitions": {}, "arcs": {}}
 
+    print(graphWidget.placesDict, "places dict")
     for placeId, placeRef in graphWidget.placesDict.items():
         placesDict.update({"id": placeId})
         placesDict.update({"pos": [round(placeRef.x(), 2), round(placeRef.y(), 2)]})
@@ -28,6 +29,7 @@ def saver(graphWidget, mode):
     for transitionId, transitionRef in graphWidget.transitionsDict.items():
         transitionsDict.update({"id": transitionId})
         transitionsDict.update({"pos": [round(transitionRef.x(), 2), round(transitionRef.y(), 2)]})
+        transitionsDict.update({"var": transitionRef.variables})
         all["transitions"].update({i: transitionsDict})
         transitionsDict = {}
         i += 1

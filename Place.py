@@ -87,7 +87,12 @@ class Place(Node):
         self.capacityTextItem.hide()
         self.tokenTextItem.hide()
         self.capacityTextItem.setPos(-7, -11)
-        if self.capacityValue > 1:
+
+        if self.capacityValue == 1:
+            self.tokenTextItem.show()
+            self.tokenTextItem.setPos(-7, -11)
+
+        elif self.capacityValue > 1:
             self.fractionLine.show()
             self.capacityTextItem.show()
             self.tokenTextItem.show()

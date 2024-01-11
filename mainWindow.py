@@ -8,6 +8,9 @@ from Place import Place
 from Saver import saver
 from Transition import Transition
 from VariableWindow import TableWindow
+from TransitionVariables import TransitionVariables
+from VariablesDock import VariablesDock
+
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
@@ -18,12 +21,12 @@ class MainWindow(QMainWindow):
         self.setGeometry(50, 50, 800, 800)
 
         self.xd = 1
-        graphWidget = GraphWidget(self)
+        self.graphWidget = GraphWidget(self)
 
 
-        self.tableWindow = None
         self.activeItem = None
-        graphWidget.activeElementChanged.connect(self.setActiveItem)
+        self.tableWindow = None
+        self.graphWidget.activeElementChanged.connect(self.setActiveItem)
 
 
 
@@ -32,17 +35,36 @@ class MainWindow(QMainWindow):
 
         file_menu = self.menuBar.addMenu("&File")
         save_action = QAction("&Save", self)
-        save_action.triggered.connect(lambda: graphWidget.saveNet())
+        save_action.triggered.connect(lambda: self.graphWidget.saveNet())
         file_menu.addAction(save_action)
 
         load_action = QAction("&Open", self)
-        load_action.triggered.connect(lambda: graphWidget.loadNet())
+        load_action.triggered.connect(lambda: self.graphWidget.loadNet())
         file_menu.addAction(load_action)
 
         view_menu = self.menuBar.addMenu("&View")
         show_dock_action = QAction("&Show menu", self)
         show_dock_action.triggered.connect(lambda: self.dock.show())
         view_menu.addAction(show_dock_action)
+
+        show_matrix = QAction("&Show matrix", self)
+        show_matrix.triggered.connect(lambda: self.graphWidget.showMatrix())
+        view_menu.addAction(show_matrix)
+
+        show_variables = QAction("&Show variables", self)
+        show_variables.triggered.connect(lambda: self.dock_variables.show())
+        view_menu.addAction(show_variables)
+
+        edit_menu = self.menuBar.addMenu("&Edit")
+        undo_action = QAction("&Undo", self)
+        undo_action.triggered.connect(lambda: self.graphWidget.undo())
+        edit_menu.addAction(undo_action)
+
+        redo_action = QAction("&Redo", self)
+        redo_action.triggered.connect(lambda: self.graphWidget.redo())
+        edit_menu.addAction(redo_action)
+
+
 
         self.dock = QDockWidget("menu", self)
         self.dock.setMinimumWidth(250)
@@ -55,6 +77,20 @@ class MainWindow(QMainWindow):
         self.dockedWidget.setLayout(self.verticalLayout)
 
         self.dock.setWidget(self.dockedWidget)
+
+        #
+        # self.dock_variables = QDockWidget("variables", self)
+        # self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock_variables)
+
+
+        self.dock_variables = VariablesDock(self, self.graphWidget)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, self.dock_variables)
+
+
+
+
+
+
 
         self.menuItem = None
         # self.labell = QLabel(str(self.menuItem))
@@ -76,7 +112,7 @@ class MainWindow(QMainWindow):
         # self.verticalLayout.addLayout(self.horizontalLayout)
 
 
-        self.setCentralWidget(graphWidget)
+        self.setCentralWidget(self.graphWidget)
 
         # self.dock.setVisible(False)
         # self.dock.hide()
@@ -84,11 +120,8 @@ class MainWindow(QMainWindow):
 
 
 
-
     def placeEditor(self):
         if self.activeItem is not None and isinstance(self.activeItem, Place):
-            # self.newLineBtn = QPushButton("+", self)
-            # self.newLineBtn.clicked.connect(self.addLine)
             editVariablesBtn = QPushButton("Edit variables", self)
             editVariablesBtn.clicked.connect(self.openVariableTable)
 
@@ -121,6 +154,16 @@ class MainWindow(QMainWindow):
             # self.verticalLayout.addWidget(self.newLineBtn)
             self.verticalLayout.setAlignment(Qt.AlignTop)
 
+
+
+        elif self.activeItem is not None and isinstance(self.activeItem, Transition):
+            editVariablesBtn = QPushButton("Edit variables", self)
+
+            editVariablesBtn.clicked.connect(self.openTransitionVariables)
+
+            self.verticalLayout.addWidget(editVariablesBtn)
+            self.verticalLayout.setAlignment(Qt.AlignTop)
+
         elif self.activeItem is not None and isinstance(self.activeItem, Edge):
             self.labell = QLabel()
 
@@ -139,15 +182,12 @@ class MainWindow(QMainWindow):
             self.verticalLayout.addLayout(self.f1)
             self.verticalLayout.setAlignment(Qt.AlignTop)
 
-            print("111")
+
 
 
 
         else:
             try:
-                # for i in self.linesArray:
-                #     self.removeLine(i[0], i[1], i[2])
-                #     self.linesArray = []
                 for i in reversed(range(self.verticalLayout.count())):
                     widget = self.verticalLayout.itemAt(i).widget()
                     if widget is not None:
@@ -169,12 +209,21 @@ class MainWindow(QMainWindow):
     def openVariableTable(self):
         if isinstance(self.activeItem, Place):
             if self.activeItem.capacityValue == 1:
-                self.a = TableWindow(self.activeItem)
+                self.a = TableWindow(self.activeItem, self.graphWidget, self)
                 # a.setGeometry(100, 100, 800, 600)
                 self.a.show()
+
             else:
                 msgBox = QMessageBox()
                 msgBox.information(self, "Information", "Can't open variable editor if capacity is greater than 0")
+
+    def openTransitionVariables(self):
+
+        if isinstance(self.activeItem, Transition):
+
+            print(self.activeItem)
+            self.transitionVariablesWindow = TransitionVariables(self.activeItem, self.graphWidget, self)
+            self.transitionVariablesWindow.show()
 
 
     def addLine(self):
@@ -212,7 +261,11 @@ class MainWindow(QMainWindow):
 
     def setPlaceToken(self):
         # print(self.capacityValue.text())
-        self.activeItem.setToken(self.tokenValue.text())
+        if int(self.tokenValue.text()) > self.activeItem.capacityValue:
+            msgBox = QMessageBox()
+            msgBox.information(self, "Information", "Token value can't be greater than capacity")
+        else:
+            self.activeItem.setToken(self.tokenValue.text())
 
     def setActiveItem(self, a):
         if a is not None and isinstance(a, Place):
@@ -231,8 +284,6 @@ class MainWindow(QMainWindow):
             self.activeItem = None
             self.labell.setText("None item selected")
         self.placeEditor()
-
-
 
     @pyqtSlot(object)
     def onJob(self, a):
