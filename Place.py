@@ -61,19 +61,21 @@ class Place(Node):
 
 
     def variablesPrint(self):
-        print(self.variables)
         posOffset = 0
+
 
         for v in self.variablesTextItems:
             v.deleteLater()
         self.variablesTextItems = []
 
+
         for key, value in self.variables.items():
+
             self.var = QGraphicsTextItem(str(key) + ":", self)
             self.var.setPos(0, posOffset)
             self.variablesTextItems.append(self.var)
 
-            self.varValue = QGraphicsTextItem(str(int(value)), self)
+            self.varValue = QGraphicsTextItem(str(value), self)
             self.varValue.setPos(12, posOffset)
             self.variablesTextItems.append(self.varValue)
             posOffset += 10
@@ -97,9 +99,9 @@ class Place(Node):
             self.capacityTextItem.show()
             self.tokenTextItem.show()
 
-            self.tokenTextItem.setPos(-7, -15)
-            self.fractionLine.setPos(-7, -15)
-            self.capacityTextItem.setPos(-7, -5)
+            self.tokenTextItem.setPos(-7, -16)
+            self.fractionLine.setPos(-7, -16)
+            self.capacityTextItem.setPos(-7, -6)
             self.capacityTextItem.setPlainText(str(self.capacityValue))
 
     def setCapacity(self, value):
@@ -138,13 +140,12 @@ class Place(Node):
         painter.drawEllipse(-7, -7, 20, 20)
 
         gradient = QRadialGradient(-3, -3, 10)
-        print(self, self.active, "Place")
         if option.state & QStyle.State_Sunken or self.active is True:
             gradient.setCenter(3, 3)
             gradient.setFocalPoint(3, 3)
             gradient.setColorAt(0, QColor(Qt.darkYellow).lighter(120))
         else:
-            gradient.setColorAt(0, Qt.blue)
+            gradient.setColorAt(0, Qt.cyan)
 
         painter.setBrush(QBrush(gradient))
         painter.setPen(QPen(Qt.black, 0))

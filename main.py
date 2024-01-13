@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
                              QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QShortcut)
 
 from Edge import Edge
-from InitialVariables import InitialVariables
 from Loader import loader
 from Matrix import Matrix
 from NewArc import NewArc
@@ -29,7 +28,7 @@ class GraphWidget(QGraphicsView):
 
         # self.mainWindow = MainWindow(self)
         # self.activeElementChanged.connect(self.mainWindow.changeMenuLabel)
-
+        self.parent = parent
         self.scene = QGraphicsScene(self)
         self.scene.setItemIndexMethod(QGraphicsScene.NoIndex)
         self.scene.setSceneRect(-200, -200, 800, 800)
@@ -92,7 +91,7 @@ class GraphWidget(QGraphicsView):
         self.activeElements = []
         self.activeElement = None
 
-        self.matrix = Matrix(self)
+        self.matrix = Matrix(self, self.parent)
         self.simulator = Simulator(self)
 
         # loader(self, "file")
@@ -100,7 +99,6 @@ class GraphWidget(QGraphicsView):
         self.variableDict = {}
         self.simulator.trigger.connect(self.costam)
 
-        self.initVariables = InitialVariables(self)
 
     def setActiveButton(self):
         self.n.reset()
@@ -177,18 +175,17 @@ class GraphWidget(QGraphicsView):
 
         #one step
         if event.key() == Qt.Key_Space:
-
             self.matrix.combo()
             mNew = self.matrix.mNew
-            print("asdasdasda1")
 
-            counter = 0
-            for key, value in self.placesDict.items():
-                value.setToken(mNew[counter])
-                counter += 1
+            if mNew:
+                counter = 0
+                for key, value in self.placesDict.items():
+                    print(value)
+                    value.setToken(mNew[counter])
+                    counter += 1
 
             # self.matrix.show()
-
             self.matrix.refresh()
 
         #start sim
@@ -231,7 +228,6 @@ class GraphWidget(QGraphicsView):
 
         if isinstance(item, Place):
             self.placesDict.pop(item.id)
-            self.showVariables()
         elif isinstance(item, Transition):
             self.transitionsDict.pop(item.id)
 

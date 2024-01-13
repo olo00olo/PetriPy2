@@ -20,7 +20,6 @@ class NewArc:
         if node is None:
             self.reset()
         elif self.source is None:
-            print(node)
             self.source = node
         else:
             if type(node) is type(self.source):

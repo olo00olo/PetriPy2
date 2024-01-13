@@ -50,7 +50,6 @@ class Transition(Node):
     def setVariables(self, s):
         self.variables = s
         self.variablesTextItem.setPlainText(s)
-        print(self.variables)
     def paint(self, painter, option, widget):
         painter.setPen(Qt.NoPen)
         painter.drawRect(-7, -7, 20, 20)

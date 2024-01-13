@@ -54,7 +54,6 @@ class Edge(QGraphicsItem):
 
         self.weightTextItem.setPlainText(str(self.weightValue))
         # self.weightTextItem.setPos(0, -50)
-        print("222")
 
     def setWeight(self, value):
         self.weightValue = value

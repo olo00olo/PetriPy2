@@ -15,16 +15,19 @@ def loader(graphWidget, mode):
 
     maxArcId = 0
     if mode == "file":
+
         # filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
         # path = filename[0]
 
-        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\3.json'
+        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\8.json'
 
         convert_file = open(path, 'r')
+
         convert_file = convert_file.read()
         # with open(path, 'r') as convert_file:
 
     else:
+
         convert_file = mode
 
     try:
@@ -56,7 +59,6 @@ def loader(graphWidget, mode):
             graphWidget.placesDict.update({newPlace.id: newPlace})
 
             Place.counter = newPlace.id + 1
-        print(graphWidget.placesDict, "loader")
 
         for key, transition in net["transitions"].items():
             newTransition = Transition(graphWidget)
@@ -76,7 +78,6 @@ def loader(graphWidget, mode):
 
             if next(iter(value)) == 'P':
                 source = places[int(value['P'])]
-                # print(source.id, "source")
                 destination = transitions[int(value['T'])]
                 newArc = Edge(source, destination)
 
@@ -105,7 +106,6 @@ def loader(graphWidget, mode):
                 source = transitions[int(value['T'])]
                 destination = places[int(value['P'])]
                 newArc = Edge(source, destination)
-                # print(places[int(arc['T'])], places[int(arc['P'])])
 
                 newArc.setId(value["id"])
                 newArc.setWeight(value["weight"])

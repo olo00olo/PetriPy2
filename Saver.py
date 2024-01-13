@@ -7,14 +7,12 @@ from Place import Place
 
 def saver(graphWidget, mode):
 
-    print("saver init")
     i = 1
     placesDict = {}
     transitionsDict = {}
     arcsDict = {}
     all = {"places": {}, "transitions": {}, "arcs": {}}
 
-    print(graphWidget.placesDict, "places dict")
     for placeId, placeRef in graphWidget.placesDict.items():
         placesDict.update({"id": placeId})
         placesDict.update({"pos": [round(placeRef.x(), 2), round(placeRef.y(), 2)]})

@@ -14,12 +14,10 @@ class VariablesDock(QDockWidget):
         self.mainWindow = mainWindow
         self.graphWidget = graphWidget
 
-        self.init_ui()
-
-        self.varDict = {}
-        self.varDict = {}
-
         self.uVar = {}
+        self.varDict = {}
+
+        self.init_ui()
 
     def init_ui(self):
         dock_widget_content = QWidget(self)
@@ -46,9 +44,9 @@ class VariablesDock(QDockWidget):
         row_position = self.table_widget.rowCount()
 
         if row_position > 0:
-            if self.table_widget.cellWidget(row_position - 1, 0).text() == "temp":
+            if self.table_widget.cellWidget(row_position - 1, 0).text() == "":
                 msgBox = QMessageBox()
-                msgBox.information(self, "Information", "First change default variable")
+                msgBox.information(self, "Information", "Change null variable first")
                 return
 
 
@@ -57,19 +55,19 @@ class VariablesDock(QDockWidget):
         item1 = QTableWidgetItem("")
         self.table_widget.setItem(row_position, 0, item1)
         line_edit = QLineEdit(self)
-        line_edit.setText("temp")
+        line_edit.setText("")
         self.table_widget.setCellWidget(row_position, 0, line_edit)
-        line_edit.editingFinished.connect(lambda: self.user_var(line_edit, item1))
-
-        self.uVar.update({line_edit: "temp"})
-        self.varDict.update({"temp": False})
-
+        line_edit.editingFinished.connect(lambda: self.new_var(line_edit, item1))
 
 
         combo_box = QComboBox(self)
         combo_box.addItems(["False", "True"])
+        combo_box.setCurrentIndex(0)
         self.table_widget.setCellWidget(row_position, 1, combo_box)
-        combo_box.currentIndexChanged.connect(lambda index: self.user_var(combo_box, item1))
+        combo_box.currentIndexChanged.connect(lambda index: self.new_var(combo_box, item1))
+
+
+        self.uVar.update({line_edit: [combo_box, ""]})
 
 
         remove_button = QPushButton("", self)
@@ -77,26 +75,34 @@ class VariablesDock(QDockWidget):
         remove_button.clicked.connect(lambda _, row=row_position: self.remove_row(row))
         self.table_widget.setCellWidget(row_position, 2, remove_button)
 
-
-
-
-    def user_var(self, widget, item):
+    def new_var(self, widget, item):
         if isinstance(widget, QComboBox):
             k = self.table_widget.cellWidget(item.row(), 0).text()
-            # if widget.currentText() == "True":
-            #     self.varDict.update({k: True})
-            # else:
-            #     self.varDict.update({k: False})
+            if k == '':
+                msgBox = QMessageBox()
+                msgBox.information(self, "Information", "Change null variable first")
+
+            else:
+                if widget.currentText() == "True":
+                    self.graphWidget.variableDict.update({k: True})
+                else:
+                    self.graphWidget.variableDict.update({k: False})
 
         else:
-            temp = self.table_widget.cellWidget(item.row(), 0).text()
+            a = self.table_widget.cellWidget(item.row(), 0)
+            b = self.table_widget.cellWidget(item.row(), 1).currentText()
+
+            if a.text() == '':
+                msgBox = QMessageBox()
+                msgBox.information(self, "Information", "Change null variable first")
+                return
+
             for key, value in self.graphWidget.placesDict.items():
-                if temp in value.variables:
+                if a.text() in value.variables:
                     msgBox = QMessageBox()
                     msgBox.information(self, "Information", "Variable already exists")
                     return
 
-            a = self.table_widget.cellWidget(item.row(), 0)
             for key, value in self.graphWidget.transitionsDict.items():
                 sp = value.variables.split()
                 for x in range(len(sp)):
@@ -117,37 +123,22 @@ class VariablesDock(QDockWidget):
                     msgBox.information(self, "Information", "Variables duplicated")
                     return
 
+            if b == "True":
+                self.graphWidget.variableDict.update({a.text(): True})
+            else:
+                self.graphWidget.variableDict.update({a.text(): False})
+
+            if self.uVar[widget][1] in self.graphWidget.variableDict.keys():
+                del self.graphWidget.variableDict[self.uVar[widget][1]]
 
 
-
-
-            self.varDict[a.text()] = self.varDict[self.uVar[a]]
-            del self.varDict[self.uVar[a]]
-
-            self.uVar.update({a: a.text()})
-
-        print(self.graphWidget.variableDict, "1111111111111")
-        self.varDict.update(self.varDict)
-        self.graphWidget.variableDict.update(self.varDict)
-        print(self.graphWidget.variableDict, "2222222222222")
-
-
-
-    # def value_changed(self, widget):
-    #     if isinstance(widget, QComboBox):
-    #         if widget.currentText() == "True":
-    #             self.userVarDict.update({k: True})
-    #         else:
-    #             self.userVarDict.update({k: False})
+            self.uVar[a] = [self.uVar[a][0], a.text()]
 
     def remove_row(self, row):
         temp = self.table_widget.cellWidget(row, 0).text()
 
-
-
         for key, value in self.graphWidget.placesDict.items():
             if temp in value.variables:
-
                 msgBox = QMessageBox()
                 msgBox.information(self, "Information", "Variable is connected to P" + str(value.id))
                 return
@@ -166,12 +157,10 @@ class VariablesDock(QDockWidget):
                         msgBox.information(self, "Information", "Variable connected to transition T" + str(key))
                         return
 
-
-        if self.table_widget.cellWidget(row, 0):
-            self.varDict.pop(temp)
-
         self.table_widget.removeRow(row)
-        self.graphWidget.variableDict = self.varDict
+
+        if temp in self.graphWidget.variableDict.keys():
+            self.graphWidget.variableDict.pop(temp)
 
         for r in range(self.table_widget.rowCount() - 1, -1, -1):
             remove_button = self.table_widget.cellWidget(r, 2)
@@ -179,53 +168,10 @@ class VariablesDock(QDockWidget):
                 remove_button.clicked.disconnect()
                 remove_button.clicked.connect(lambda _, row=r: self.remove_row(row))
 
-    def populate_table(self):
-        for key, value in self.varDict.items():
-            row_position = self.table_widget.rowCount()
-            self.table_widget.insertRow(row_position)
 
-            item1 = QTableWidgetItem(str(key))
-            self.table_widget.setItem(row_position, 0, item1)
-            line_edit = QLineEdit(self)
-            line_edit.setText(key)
-            self.table_widget.setCellWidget(row_position, 0, line_edit)
-            line_edit.editingFinished.connect(lambda: self.user_var(line_edit, item1))
-
-            combo_box = QComboBox(self)
-            combo_box.addItems(["False", "True"])
-            self.table_widget.setCellWidget(row_position, 1, combo_box)
-            combo_box.currentIndexChanged.connect(lambda index: self.user_var(combo_box, item1))
-
-            if value == True:
-                combo_box.setCurrentIndex(0)
-            else:
-                combo_box.setCurrentIndex(1)
-
-            remove_button = QPushButton("", self)
-            remove_button.setIcon(QIcon("./icons/bin.png"))
-            remove_button.clicked.connect(lambda _, row=row_position: self.remove_row(row))
-
-            self.table_widget.setCellWidget(row_position, 2, remove_button)
-
-    # def refresh_values(self):
-    #     self.table_widget.setRowCount(0)
-    #
-    #     newVarDict = {}
-    #     for key, value in self.graphWidget.placesDict.items():
-    #         newVarDict.update(value.variables)
-    #
-    #     for key, value in self.varDict.items():
-    #         if key in newVarDict.keys():
-    #             newVarDict.update({key: value})
-    #
-    #
-    #     self.varDict = newVarDict
-    #     self.graphWidget.variableDict = self.varDict
-    #     self.populate_table()
-
-
-    def refresh_values(self):
-        self.table_widget.setRowCount(0)
-
-        self.varDict = self.graphWidget.variableDict
-        self.populate_table()
+    def refresh_table(self):
+        for row in range(self.table_widget.rowCount()):
+            print("XDD")
+            a = self.table_widget.cellWidget(row, 0).text()
+            print(row, self.table_widget.cellWidget(row, 0).text(), self.graphWidget.variableDict[a])
+            self.table_widget.cellWidget(row, 1).setCurrentText(str(self.graphWidget.variableDict[a]))

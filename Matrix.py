@@ -8,9 +8,11 @@ from Place import Place
 from Transition import Transition
 import numpy as np
 
+from parser import parser
+
 
 class Matrix(QDialog):
-    def __init__(self, item):
+    def __init__(self, item, mainWindow):
         super().__init__()
 
         self.places = []
@@ -23,6 +25,7 @@ class Matrix(QDialog):
         self.mNew = []
 
         self.item = item
+        self.mainWindow = mainWindow
         self.table_widget2 = QTableWidget(self)
         self.table_widget = QTableWidget(self)
 
@@ -70,7 +73,6 @@ class Matrix(QDialog):
 
             for place in self.places:
                 temp[place.id] = 0
-                print(temp, "temp")
 
             for key, value in transition.inArcs.items():
                 weight = value[0].weightValue
@@ -83,30 +85,21 @@ class Matrix(QDialog):
                 temp[next(iter(value[2].keys()))] = weight
                 temp = dict(sorted(temp.items()))
 
-            print(temp, "temp")
             for key, value in temp.items():
                 ab.append(value)
 
-            print(ab, "ab")
-            print(len(ab), 'len')
             self.c.append(ab)
 
 
-        # print(self.c)
+
         if self.c:
-            # print("XD")
+
             self.table_widget2.setRowCount(len(self.c))
             self.table_widget2.setColumnCount(len(self.c[0]))
-            # print(self.c)
 
 
             for i, row in enumerate(self.c):
                 for j, value in enumerate(row):
-
-                    # item = QTableWidgetItem(str(value))
-                    # print(i, j, self.item, value)
-                    # print("XDDDDD")
-
                     self.table_widget2.setItem(i, j, QTableWidgetItem(str(value)))
 
 
@@ -124,86 +117,261 @@ class Matrix(QDialog):
             # table_widget.setItem(0, col, QTableWidgetItem("XD"))
 
             self.table_widget.setItem(0, col, QTableWidgetItem(str((self.places[col]).tokens)))
-            self.m.append(self.places[col].tokens)
+            self.m.append(int(self.places[col].tokens))
 
             self.table_widget.setItem(1, col, QTableWidgetItem(str((self.places[col]).capacityValue)))
             self.k.append(self.places[col].capacityValue)
 
     def matrixU(self):
 
-        sum = 0
-        temp = []
+        # sum = 0
+
+        if len(self.item.transitionsDict) == 1 and len(self.item.placesDict) == 0:
+            self.mNew = self.m
+
+        elif len(self.item.transitionsDict) == 0 and len(self.item.placesDict) == 1:
+            self.mNew = self.m
+
+        elif len(self.item.transitionsDict) == 1 and len(self.item.placesDict) == 1:
+            if len(self.item.arcsDict) == 1:
+                u = 0
+                uCap = 0
+                self.c = self.c[0]
+                if self.c[0] < 0:
+                    if self.m[0] >= abs(self.c[0]):
+                        u = 1
+                    else:
+                        u = 0
+                else:
+                    u = 1
+
+                if self.k[0] - self.m[0] >= self.c[0]:
+                    uCap = 1
+
+                uVar = (self.varActivity())[0]
+
+                if u + uCap + uVar == 3:
+                    self.mNew.append(self.c[0] + self.m[0])
+
+                if self.c[0] < 0 and u + uCap + uVar == 3:
+                    for key, value in self.item.placesDict.items():
+                        for key2, value2 in value.variables.items():
+                            self.item.variableDict.update({key2: value2})
+
+                    self.mainWindow.dock_variables.refresh_table()
+
+
+        elif len(self.item.transitionsDict) > 1 and len(self.item.placesDict) == 1:
+            if len(self.item.arcsDict) > 0:
+                u = []
+                uCap = []
+
+                for row in range(len(self.c)):
+                    if self.c[row][0] < 0:
+                        if self.m[0] >= abs(self.c[row][0]):
+                            u.append(1)
+                        else:
+                            u.append(0)
+                    else:
+                        u.append(1)
+
+                    if self.c[row][0] > 0:
+                        if self.k[0] - self.m[0] >= self.c[row][0]:
+                            uCap.append(1)
+                        else:
+                            uCap.append(0)
+                    else:
+                        uCap.append(1)
+
+                uVar = (self.varActivity())
+
+                sum = 0
+                sum2 = 0
+                sum3 = 0
+
+                for x in range(len(self.c)):
+                    sum += u[x]
+                    sum2 += uCap[x]
+                    sum3 += uVar[x]
+
+                if sum == len(self.c) and sum2 == len(self.c) and sum3 == len(self.c):
+                    s = 0
+                    for x in range(len(self.c)):
+                        s += self.c[x][0]
+                    self.mNew = [self.m[0] + s]
+                    for key, value in self.item.placesDict.items():
+                        for key2, value2 in value.variables.items():
+                            self.item.variableDict.update({key2: value2})
+
+                    self.mainWindow.dock_variables.refresh_table()
+
+
+
+        elif len(self.item.transitionsDict) == 1 and len(self.item.placesDict) > 1:
+            if len(self.item.arcsDict) > 0:
+                self.c = self.c[0]
+
+                u = []
+                uCap = []
+                for x in range(len(self.c)):
+                    if self.c[x] < 0:
+                        if self.m[x] >= abs(self.c[x]):
+                            u.append(1)
+                        else:
+                            u.append(0)
+                    else:
+                        u.append(1)
+
+                    if self.c[x] > 0:
+                        if self.k[x] - self.m[x] >= self.c[x]:
+                            uCap.append(1)
+                        else:
+                            uCap.append(0)
+                    else:
+                        uCap.append(1)
+
+                    # if self.c[x] == 0:
+                    #     u.append(1)
+                    #     uCap.append(1)
+
+                sum = 0
+                sum2 = 0
+                uVar = (self.varActivity())
+
+                for x in range(len(self.m)):
+                    sum += u[x]
+                    sum2 += uCap[x]
+
+                if sum == len(self.m) and sum2 == len(self.m) and uVar[0] == 1:
+                    self.mNew = list(np.add(self.m, self.c))
+
+                    for key, value in self.item.placesDict.items():
+                        for key2, value2 in value.variables.items():
+                            self.item.variableDict.update({key2: value2})
+
+                    self.mainWindow.dock_variables.refresh_table()
+
+
+
+
         #aktywnosc ze znakowania
+        else:
+            temp = []
+            sum = 0
+
+            if len(self.c) > 0:
+                if len(self.c[0]) > 0:
+                    for col in range(len(self.c[0])):
+                        for row in range(len(self.c)):
+                            if self.c[row][col] < 0:
+                                sum += self.c[row][col]
+                        if sum < 0:
+                            temp.append(abs(sum))
+                        else:
+                            temp.append(999)
+
+                        sum = 0
+
+                    for col in range(len(self.c)):
+                        if self.m[col] >= temp[col]:
+                            self.u.append(1)
+                        else:
+                            self.u.append(0)
+
+                    self.u = list(np.logical_and(self.u, self.varActivity()))
+                    self.u = list(map(int, self.u))
+
+                    self.u = list(np.logical_and(self.u, self.capActivity()))
+                    self.u = list(map(int, self.u))
+
+                    self.mNew = list(np.add(self.m, np.matmul(self.u, self.c)))
+                    for col in range(len(self.u)):
+                        if self.u[col] == 1:
+                            for row in range(len(self.c[col])):
+                                if self.c[col][row] > 0:
+                                    counter = 0
+                                    for key, value in self.item.placesDict.items():
+                                        if counter == col:
+                                            for key2, value2 in value.variables.items():
+                                                self.item.variableDict.update({key2: value2})
+                                        counter += 1
+                                    self.mainWindow.dock_variables.refresh_table()
+
+    def tokenActivity(self):
+        temp = []
+        u = []
+        # if len(self.c) == 1:
+        #     self.c = self.c[0]
+
+        for col in range(len(self.c[0])):
+            for row in range(len(self.c)):
+                if self.c[row][col] < 0:
+                    sum += self.c[row][col]
+            if sum < 0:
+                temp.append(abs(sum))
+            else:
+                temp.append(999)
+
+            sum = 0
+
+        for col in range(len(self.c)):
+            if self.m[col] >= temp[col]:
+                u.append(1)
+            else:
+                u.append(0)
+
+        return u
+
+
+    #przepelnienie
+    def capActivity(self):
+        temp = []
+        temp1 = []
+        temp2 = []
+        uCap = []
+        sum = 0
         if len(self.c) > 0:
             if len(self.c[0]) > 0:
                 for col in range(len(self.c[0])):
                     for row in range(len(self.c)):
-                        if self.c[row][col] < 0:
+                        if self.c[row][col] > 0:
                             sum += self.c[row][col]
-                    if sum < 0:
-                        temp.append(abs(sum))
+                    if self.k[col] - self.m[col] < sum:
+                        temp.append(0)
                     else:
-                        temp.append(999)
-
+                        temp.append(1)
                     sum = 0
 
-                print(self.m, "3?")
-                for col in range(len(self.c[0])):
+                for x in range(len(temp)):
+                    if temp[x] == 0:
+                        for y in range(len(self.c)):
+                            if self.c[y][x] > 0:
+                                temp1.append(0)
+                            else:
+                                temp1.append(1)
+                        temp2.append(temp1)
+                        temp1 = []
 
-                    if self.m[col] >= temp[col]:
-                        self.u.append(1)
-                    else:
-                        self.u.append(0)
+                uCap = [1] * len(self.c)
+                for x in range(len(temp2)):
+                    uCap = list(np.logical_and(uCap, temp2[x]))
+                    uCap = list(map(int, uCap))
 
-                self.c = np.add(self.c, self.varActivity())
-                self.mNew = np.add(self.m, np.matmul(self.u, self.c))
 
-        # self.varActivity()
+        return uCap
 
     #aktywnosc ze zmiennych
     def varActivity(self):
         varC = []
-        temp = self.item.variableDict
-        print(temp)
 
-        if len(self.item.transitionsDict) > 0:
-            for key, value in self.item.transitionsDict.items():
-                sp = value.variables.split()
-                if len(sp) == 0:
-                    varC.append(1)
-                    print(varC, "var0")
-                elif len(sp) == 1:
-                    if sp[0][0] == "~":
-                        varC.append(not temp[sp[0][1:]])
-                    else:
-                        varC.append(temp[sp[0]])
-                    print(varC, "var1")
-                else:
-                    if sp[0][0] == "~":
-                        temp1 = not temp[sp[0][1:]]
-                    else:
-                        temp1 = temp[sp[0]]
-                    for x in range(1, len(sp)-1):
-                        if sp[x] == "OR":
-                            if sp[x+1][0] == "~":
-                                temp1 += not temp[sp[x+1][1:]]
-                                temp1 = bool(temp1)
-                            else:
-                                temp1 += temp[sp[x+1]]
-                                temp1 = bool(temp1)
-                        else:
-                            if sp[x+1][0] == "~":
-                                temp2 = not temp[sp[x+1][1:]]
-                                temp2 = bool(temp2)
-                                temp1 = temp1 * temp2
-                                temp1 = bool(temp1)
-                            else:
-                                temp2 = temp[sp[x + 1]]
-                                temp2 = bool(temp2)
-                                temp1 = temp1 * temp2
-                                temp1 = bool(temp1)
-                    varC.append(int(temp1))
-            return(varC)
+        for key, value in self.item.transitionsDict.items():
+            if value.variables != "":
+                a = parser(value.variables, self.item.variableDict)
+                varC.append(int(a))
+            else:
+                varC.append(1)
+        return(varC)
+
 
     def refresh(self):
         for col in range(len(self.places)):

@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSlot
 from PyQt5.QtGui import QIntValidator
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit, QMenu, QWidget, \
-    QHBoxLayout, QAction, QFormLayout, QLabel, QMessageBox
+    QHBoxLayout, QAction, QFormLayout, QLabel, QMessageBox, QToolBar
 
 from Edge import Edge
 from Place import Place
@@ -9,12 +9,13 @@ from Saver import saver
 from Transition import Transition
 from VariableWindow import TableWindow
 from TransitionVariables import TransitionVariables
-from VariablesDock import VariablesDock
+# from VariablesDock import VariablesDock
+from VariableDock2 import VariablesDock
+
 
 
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
-        # print(self)
         super(MainWindow, self).__init__(parent=parent)
         from main import GraphWidget
         self.linesArray = []
@@ -117,6 +118,11 @@ class MainWindow(QMainWindow):
         # self.dock.setVisible(False)
         # self.dock.hide()
 
+        toolbar = QToolBar(self)
+        toolbar.setFixedHeight(50)
+        toolbar.setFixedWidth(100)
+        toolbar.setMovable(False)
+        self.addToolBar(toolbar)
 
 
 
@@ -128,11 +134,11 @@ class MainWindow(QMainWindow):
             self.labell = QLabel()
 
             onlyInt = QIntValidator()
-            onlyInt.setRange(1, 9)
+            onlyInt.setRange(0, 9)
 
             self.capacityLabel = QLabel()
             self.capacityLabel.setText("Capacity: ")
-            self.capacityValue = QLineEdit()
+            self.capacityValue = QLineEdit(self)
             self.capacityValue.setText(str(self.activeItem.capacityValue))
             self.capacityValue.setValidator(onlyInt)
             self.capacityValue.editingFinished.connect(self.setPlaceCapacity)
@@ -141,7 +147,7 @@ class MainWindow(QMainWindow):
 
             self.tokenLabel = QLabel()
             self.tokenLabel.setText("Token: ")
-            self.tokenValue = QLineEdit()
+            self.tokenValue = QLineEdit(self)
             self.tokenValue.setText(str(self.activeItem.tokens))
             self.tokenValue.setValidator(onlyInt)
             self.tokenValue.editingFinished.connect(self.setPlaceToken)
@@ -150,8 +156,8 @@ class MainWindow(QMainWindow):
 
             self.verticalLayout.addLayout(self.f2)
             self.verticalLayout.addLayout(self.f1)
+
             self.verticalLayout.addWidget(editVariablesBtn)
-            # self.verticalLayout.addWidget(self.newLineBtn)
             self.verticalLayout.setAlignment(Qt.AlignTop)
 
 
@@ -171,7 +177,7 @@ class MainWindow(QMainWindow):
             onlyInt.setRange(1, 9)
             self.weightLabel = QLabel()
             self.weightLabel.setText("Weight: ")
-            self.weightValue = QLineEdit()
+            self.weightValue = QLineEdit(self)
             self.weightValue.setText(str(self.activeItem.weightValue))
             self.weightValue.setValidator(onlyInt)
             self.weightValue.editingFinished.connect(self.setArcWeight)
@@ -188,23 +194,26 @@ class MainWindow(QMainWindow):
 
         else:
             try:
+                pass
                 for i in reversed(range(self.verticalLayout.count())):
                     widget = self.verticalLayout.itemAt(i).widget()
                     if widget is not None:
-                        widget.setParent(None)
+                        widget.deleteLater()
                 for i in reversed(range(self.f1.count())):
                     widget = self.f1.itemAt(i).widget()
                     if widget is not None:
-                        widget.setParent(None)
+                        widget.deleteLater()
+                        # widget.setParent(None)
                 for i in reversed(range(self.f2.count())):
                     widget = self.f2.itemAt(i).widget()
                     if widget is not None:
-                        widget.setParent(None)
-
+                        widget.deleteLater()
+                        # widget.setParent(None)
+                #
                 self.labell = QLabel("None item selected")
                 self.verticalLayout.addWidget(self.labell)
             except:
-                print("XD")
+                pass
 
     def openVariableTable(self):
         if isinstance(self.activeItem, Place):
@@ -221,7 +230,6 @@ class MainWindow(QMainWindow):
 
         if isinstance(self.activeItem, Transition):
 
-            print(self.activeItem)
             self.transitionVariablesWindow = TransitionVariables(self.activeItem, self.graphWidget, self)
             self.transitionVariablesWindow.show()
 
@@ -245,13 +253,10 @@ class MainWindow(QMainWindow):
         line.setParent(None)
 
     def setArcWeight(self):
-        print(self.activeItem)
         self.activeItem.setWeight(self.weightValue.text())
 
 
     def setPlaceCapacity(self):
-        # print(self.capacityValue.text())
-        # print(self.capacityValue)
         if bool(self.activeItem.variables):
             msgBox = QMessageBox()
             msgBox.information(self, "Information", "Can't change capacity if any variable exist")
@@ -260,7 +265,6 @@ class MainWindow(QMainWindow):
 
 
     def setPlaceToken(self):
-        # print(self.capacityValue.text())
         if int(self.tokenValue.text()) > self.activeItem.capacityValue:
             msgBox = QMessageBox()
             msgBox.information(self, "Information", "Token value can't be greater than capacity")

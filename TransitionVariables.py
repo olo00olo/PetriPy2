@@ -35,7 +35,6 @@ class TransitionVariables(QDialog):
         self.init_combo_box_options()
         self.initial_table()
 
-        # print(self.mainWindow)
 
 
 
@@ -54,9 +53,7 @@ class TransitionVariables(QDialog):
                         self.table_widget.cellWidget(x, 1).setCurrentIndex(index)
 
                     else:
-                        print("XD", expression[x])
                         index = self.combo_box2_options.index(expression[x])
-                        print(expression[x], index)
                         self.table_widget.cellWidget(x, 1).setCurrentIndex(index)
 
                 else:
@@ -72,11 +69,9 @@ class TransitionVariables(QDialog):
         varList = []
         # for key, value in self.graphWidget.placesDict.items():
         #     varList.extend(list(value.variables.keys()))
-        # print(self.graphWidget.variableDict.items())
         for key, value in self.graphWidget.variableDict.items():
             varList.append(key)
-        for key, value in self.mainWindow.dock_variables.userVarDict.items():
-            varList.append(key)
+
 
         combo_box1_options = ["", "~"]
         self.combo_box1_options = combo_box1_options
@@ -84,7 +79,6 @@ class TransitionVariables(QDialog):
         combo_box2_options = [""]
         combo_box2_options.extend(varList)
         combo_box2_options = list(set(combo_box2_options))
-        print(combo_box2_options, "combo2")
         self.combo_box2_options = combo_box2_options
 
         combo_box3_options = ["", "OR", "AND"]
@@ -146,38 +140,41 @@ class TransitionVariables(QDialog):
                 remove_button.clicked.connect(lambda state, row=r: self.remove_row(row))
 
     def apply(self):
-        expression = ""
+        if self.table_widget.rowCount() == 0:
+            self.transition.setVariables("")
 
-        rows = self.table_widget.rowCount()
-
-        if rows % 2 == 0 and rows > 0:
-            newRange = rows - 1
         else:
-            newRange = rows
+            expression = ""
 
-        for x in range(newRange):
-            if x % 2 == 0:
-                if self.table_widget.cellWidget(x, 1).currentText() == "":
-                    msgBox = QMessageBox()
-                    msgBox.information(self, "Information", "Variable cell can't be empty. Delete or choose variable.")
-                else:
-                    if self.table_widget.cellWidget(x, 0).currentText() == "~":
-                        expression += "~" + self.table_widget.cellWidget(x, 1).currentText() + " "
-                    else:
-                        expression += self.table_widget.cellWidget(x, 1).currentText() + " "
+            rows = self.table_widget.rowCount()
 
+            if rows % 2 == 0 and rows > 0:
+                newRange = rows - 1
             else:
-                if self.table_widget.cellWidget(x, 1).currentText() == "":
-                    msgBox = QMessageBox()
-                    msgBox.information(self, "Information", "Operator cell can't be empty. Delete or choose operator.")
-                elif self.table_widget.cellWidget(x, 1).currentText() == "OR":
-                    expression += "OR "
-                elif self.table_widget.cellWidget(x, 1).currentText() == "AND":
-                    expression += "AND "
-        if rows > 0:
-            expression = expression[:-1]
-            self.transition.setVariables(expression)
+                newRange = rows
 
+            for x in range(newRange):
+                if x % 2 == 0:
+                    if self.table_widget.cellWidget(x, 1).currentText() == "":
+                        msgBox = QMessageBox()
+                        msgBox.information(self, "Information", "Variable cell can't be empty. Delete or choose variable.")
+                    else:
+                        if self.table_widget.cellWidget(x, 0).currentText() == "~":
+                            expression += "~" + self.table_widget.cellWidget(x, 1).currentText() + " "
+                        else:
+                            expression += self.table_widget.cellWidget(x, 1).currentText() + " "
 
-            self.graphWidget.undoHeap.append(saver(self.graphWidget, "heap"))
-            self.graphWidget.redoHeap = []
+                else:
+                    if self.table_widget.cellWidget(x, 1).currentText() == "":
+                        msgBox = QMessageBox()
+                        msgBox.information(self, "Information", "Operator cell can't be empty. Delete or choose operator.")
+                    elif self.table_widget.cellWidget(x, 1).currentText() == "OR":
+                        expression += "OR "
+                    elif self.table_widget.cellWidget(x, 1).currentText() == "AND":
+                        expression += "AND "
+            if rows > 0:
+                expression = expression[:-1]
+                self.transition.setVariables(expression)
+
+                self.graphWidget.undoHeap.append(saver(self.graphWidget, "heap"))
+                self.graphWidget.redoHeap = []
