@@ -13,6 +13,7 @@ def saver(graphWidget, mode):
     arcsDict = {}
     all = {"places": {}, "transitions": {}, "arcs": {}}
 
+    print(placesDict)
     for placeId, placeRef in graphWidget.placesDict.items():
         placesDict.update({"id": placeId})
         placesDict.update({"pos": [round(placeRef.x(), 2), round(placeRef.y(), 2)]})

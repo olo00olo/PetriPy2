@@ -1,7 +1,7 @@
-from PyQt5.QtCore import Qt, pyqtSlot
-from PyQt5.QtGui import QIntValidator
+from PyQt5.QtCore import Qt, pyqtSlot, QSize
+from PyQt5.QtGui import QIntValidator, QIcon
 from PyQt5.QtWidgets import QMainWindow, QDockWidget, QApplication, QPushButton, QVBoxLayout, QLineEdit, QMenu, QWidget, \
-    QHBoxLayout, QAction, QFormLayout, QLabel, QMessageBox, QToolBar
+    QHBoxLayout, QAction, QFormLayout, QLabel, QMessageBox, QToolBar, QSizePolicy
 
 from Edge import Edge
 from Place import Place
@@ -29,7 +29,9 @@ class MainWindow(QMainWindow):
         self.tableWindow = None
         self.graphWidget.activeElementChanged.connect(self.setActiveItem)
 
+        self.setWindowTitle("PetryPy")
 
+        self.setWindowIcon(QIcon('./icons/mainIcon.png'))
 
         # TODO: menu bar
         self.menuBar = self.menuBar()
@@ -118,11 +120,25 @@ class MainWindow(QMainWindow):
         # self.dock.setVisible(False)
         # self.dock.hide()
 
-        toolbar = QToolBar(self)
-        toolbar.setFixedHeight(50)
-        toolbar.setFixedWidth(100)
-        toolbar.setMovable(False)
-        self.addToolBar(toolbar)
+        # toolbar = QToolBar(self)
+        # toolbar.setFixedHeight(50)
+        # # toolbar.setFixedWidth(100)
+        # toolbar.setMovable(False)
+        # spacer = QWidget(self)
+        # spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        # toolbar.addWidget(spacer)
+        # self.addToolBar(toolbar)
+        #
+        # akcja1 = QAction('Akcja 1', self)
+        # ikon1 = QIcon("./icons/circle.png")
+        # ikon1.actualSize(QSize(50,50))
+        # akcja1.setIcon(ikon1)
+        # # akcja1.triggered.connect(self.akcja1_triggered)
+        # toolbar.addAction(akcja1)
+
+
+        # remove_button.setIcon(QIcon("./icons/bin.png"))
+
 
 
 

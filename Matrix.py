@@ -182,28 +182,57 @@ class Matrix(QDialog):
                             uCap.append(0)
                     else:
                         uCap.append(1)
-
                 uVar = (self.varActivity())
 
-                sum = 0
-                sum2 = 0
-                sum3 = 0
+                # sum = 0
+                # sum2 = 0
+                # sum3 = 0
 
+                self.u = list(np.logical_and(u, uCap))
+                self.u = list(map(int, self.u))
+
+                self.u = list(np.logical_and(self.u, self.varActivity()))
+                self.u = list(map(int, self.u))
+
+                # d = list(np.add(self.m, np.matmul(self.u, self.c)))
+                # if d[0] > self.k[0] - self.m[0]:
+                #     msgBox = QMessageBox()
+                #     msgBox.information(self, "Information", "Conflict")
+
+                a = 0
                 for x in range(len(self.c)):
-                    sum += u[x]
-                    sum2 += uCap[x]
-                    sum3 += uVar[x]
+                    a += self.u[x] * self.c[x][0]
+                if a > self.k[0] - self.m[0]:
+                    msgBox = QMessageBox()
+                    msgBox.information(self, "Information", "Solve conflict before continuation")
+                    self.mNew = self.m
+                    self.item.stop_simulationFun()
+                    return
 
-                if sum == len(self.c) and sum2 == len(self.c) and sum3 == len(self.c):
-                    s = 0
-                    for x in range(len(self.c)):
-                        s += self.c[x][0]
-                    self.mNew = [self.m[0] + s]
-                    for key, value in self.item.placesDict.items():
-                        for key2, value2 in value.variables.items():
-                            self.item.variableDict.update({key2: value2})
+                self.mNew = list(np.add(self.m, np.matmul(self.u, self.c)))
 
-                    self.mainWindow.dock_variables.refresh_table()
+
+                for x in range(len(self.u)):
+                    if self.u[x] == 1 and self.c[x][0] < 0:
+                        for key, value in self.item.placesDict.items():
+                            for key2, value2 in value.variables.items():
+                                self.item.variableDict.update({key2: value2})
+
+                        self.mainWindow.dock_variables.refresh_table()
+                # if sum == len(self.c) and sum2 == len(self.c) and sum3 == len(self.c):
+                #     s = 0
+                #     for x in range(len(self.c)):
+                #         s += self.c[x][0]
+                #         print("XD")
+                #     self.mNew = [self.m[0] + s]
+                #     print("XDD", self.mNew)
+
+                    #todo: ustawianie zmiennych
+                    # for key, value in self.item.placesDict.items():
+                    #     for key2, value2 in value.variables.items():
+                    #         self.item.variableDict.update({key2: value2})
+                    #
+                    # self.mainWindow.dock_variables.refresh_table()
 
 
 
@@ -261,28 +290,61 @@ class Matrix(QDialog):
 
             if len(self.c) > 0:
                 if len(self.c[0]) > 0:
-                    for col in range(len(self.c[0])):
-                        for row in range(len(self.c)):
+                    # for col in range(len(self.c[0])):
+                    #     for row in range(len(self.c)):
+                    #         if self.c[row][col] < 0:
+                    #             sum += self.c[row][col]
+                    #     if sum < 0:
+                    #         temp.append(abs(sum))
+                    #     else:
+                    #         temp.append(999)
+                    #
+                    #     sum = 0
+                    # print(self.c, self.m, temp)
+                    # for col in range(len(self.c)):
+                    #     if self.m[col] >= temp[col]:
+                    #         self.u.append(1)
+                    #     else:
+                    #         self.u.append(0)
+                    print(self.c)
+                    temp1 = 0
+                    for row in range(len(self.c)):
+                        for col in range(len(self.c[0])):
                             if self.c[row][col] < 0:
-                                sum += self.c[row][col]
-                        if sum < 0:
-                            temp.append(abs(sum))
-                        else:
-                            temp.append(999)
-
-                        sum = 0
-
-                    for col in range(len(self.c)):
-                        if self.m[col] >= temp[col]:
-                            self.u.append(1)
-                        else:
+                                if self.m[col] < abs(self.c[row][col]):
+                                    temp1 = 1
+                                    break
+                                else:
+                                    temp1 = 0
+                        if temp1 == 1:
                             self.u.append(0)
+                        else:
+                            self.u.append(1)
+                        temp1 = 0
+                        # print("sd", self.u, temp1)
 
+
+
+                    print("XDD")
                     self.u = list(np.logical_and(self.u, self.varActivity()))
                     self.u = list(map(int, self.u))
+                    print("XDDD")
 
                     self.u = list(np.logical_and(self.u, self.capActivity()))
                     self.u = list(map(int, self.u))
+
+                    a = 0
+                    for y in range(len(self.c[0])):
+                        for x in range(len(self.c)):
+                            a += self.u[x] * self.c[x][y]
+                        if a > self.k[y] - self.m[y]:
+                            msgBox = QMessageBox()
+                            msgBox.information(self, "Information", "Solve conflict before continuation")
+                            self.mNew = self.m
+                            self.item.stop_simulationFun()
+                            return
+                        a = 0
+
 
                     self.mNew = list(np.add(self.m, np.matmul(self.u, self.c)))
                     for col in range(len(self.u)):
@@ -325,38 +387,52 @@ class Matrix(QDialog):
 
     #przepelnienie
     def capActivity(self):
-        temp = []
-        temp1 = []
-        temp2 = []
+        # temp = []
+        # temp1 = []
+        # temp2 = []
+        # uCap = []
+        # sum = 0
+        # if len(self.c) > 0:
+        #     if len(self.c[0]) > 0:
+        #         for col in range(len(self.c[0])):
+        #             for row in range(len(self.c)):
+        #                 if self.c[row][col] > 0:
+        #                     sum += self.c[row][col]
+        #             if self.k[col] - self.m[col] < sum:
+        #                 temp.append(0)
+        #             else:
+        #                 temp.append(1)
+        #             sum = 0
+        #
+        #         for x in range(len(temp)):
+        #             if temp[x] == 0:
+        #                 for y in range(len(self.c)):
+        #                     if self.c[y][x] > 0:
+        #                         temp1.append(0)
+        #                     else:
+        #                         temp1.append(1)
+        #                 temp2.append(temp1)
+        #                 temp1 = []
+        #
+        #         uCap = [1] * len(self.c)
+        #         for x in range(len(temp2)):
+        #             uCap = list(np.logical_and(uCap, temp2[x]))
+        #             uCap = list(map(int, uCap))
         uCap = []
-        sum = 0
-        if len(self.c) > 0:
-            if len(self.c[0]) > 0:
-                for col in range(len(self.c[0])):
-                    for row in range(len(self.c)):
-                        if self.c[row][col] > 0:
-                            sum += self.c[row][col]
-                    if self.k[col] - self.m[col] < sum:
-                        temp.append(0)
+        temp1 = 0
+        for row in range(len(self.c)):
+            for col in range(len(self.c[0])):
+                if self.c[row][col] > 0:
+                    if self.k[col] - self.m[col] < self.c[row][col]:
+                        temp1 = 1
+                        break
                     else:
-                        temp.append(1)
-                    sum = 0
-
-                for x in range(len(temp)):
-                    if temp[x] == 0:
-                        for y in range(len(self.c)):
-                            if self.c[y][x] > 0:
-                                temp1.append(0)
-                            else:
-                                temp1.append(1)
-                        temp2.append(temp1)
-                        temp1 = []
-
-                uCap = [1] * len(self.c)
-                for x in range(len(temp2)):
-                    uCap = list(np.logical_and(uCap, temp2[x]))
-                    uCap = list(map(int, uCap))
-
+                        temp1 = 0
+            if temp1 == 1:
+                uCap.append(0)
+            else:
+                uCap.append(1)
+            temp1 = 0
 
         return uCap
 

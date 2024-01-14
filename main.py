@@ -1,7 +1,7 @@
 import math
 
-from PyQt5.QtCore import (QRectF, Qt, pyqtSignal, pyqtSlot)
-from PyQt5.QtGui import (QPainter, QKeySequence)
+from PyQt5.QtCore import (QRectF, Qt, pyqtSignal, pyqtSlot, QSize)
+from PyQt5.QtGui import (QPainter, QKeySequence, QIcon)
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
                              QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QShortcut)
 
@@ -40,25 +40,62 @@ class GraphWidget(QGraphicsView):
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
 
-        self.addPlaceBtn = QPushButton("add place", self)
+        self.addPlaceBtn = QPushButton(self)
         self.addPlaceBtn.move(5, 5)
         self.addPlaceBtn.setCheckable(True)
         self.addPlaceBtn.clicked.connect(self.setActiveButton)
+        self.addPlaceBtn.setIcon(QIcon("./icons/circle.png"))
+        self.addPlaceBtn.setFixedSize(50, 50)
+        self.addPlaceBtn.setIconSize(QSize(40, 40))
 
 
-        self.addTransitionBtn = QPushButton("add transition", self)
-        self.addTransitionBtn.move(155, 5)
+        self.addTransitionBtn = QPushButton("", self)
+        self.addTransitionBtn.move(55, 5)
         self.addTransitionBtn.setCheckable(True)
         self.addTransitionBtn.clicked.connect(self.setActiveButton)
+        self.addTransitionBtn.setIcon(QIcon("./icons/rectangle.png"))
+        self.addTransitionBtn.setFixedSize(50, 50)
+        self.addTransitionBtn.setIconSize(QSize(40, 40))
 
-        self.addArcButton = QPushButton("add arc", self)
-        self.addArcButton.move(305, 5)
+
+        self.addArcButton = QPushButton("", self)
+        self.addArcButton.move(105, 5)
         self.addArcButton.setCheckable(True)
         self.addArcButton.clicked.connect(self.setActiveButton)
+        self.addArcButton.setIcon(QIcon("./icons/arc.png"))
+        self.addArcButton.setFixedSize(50, 50)
+        self.addArcButton.setIconSize(QSize(40, 40))
 
-        self.saveNetButton = QPushButton("save net", self)
-        self.saveNetButton.move(455, 5)
-        self.saveNetButton.clicked.connect(lambda: saver(self, "file"))
+        # self.saveNetButton = QPushButton("save net", self)
+        # self.saveNetButton.move(455, 5)
+        # self.saveNetButton.clicked.connect(lambda: saver(self, "file"))
+
+
+        self.start_simulation_button = QPushButton("", self)
+        self.start_simulation_button.move(205, 5)
+        self.start_simulation_button.setCheckable(True)
+        self.start_simulation_button.clicked.connect(self.start_simulationFun)
+        self.start_simulation_button.setIcon(QIcon("./icons/play.png"))
+        self.start_simulation_button.setFixedSize(50, 50)
+        self.start_simulation_button.setIconSize(QSize(40, 40))
+
+
+        self.step_button = QPushButton("", self)
+        self.step_button.move(255, 5)
+        self.step_button.setCheckable(False)
+        self.step_button.clicked.connect(self.step_forward)
+        self.step_button.setIcon(QIcon("./icons/step.png"))
+        self.step_button.setFixedSize(50, 50)
+        self.step_button.setIconSize(QSize(40, 40))
+
+        self.stop_simulation = QPushButton("", self)
+        self.stop_simulation.move(305, 5)
+        self.stop_simulation.setCheckable(False)
+        self.stop_simulation.clicked.connect(self.stop_simulationFun)
+        self.stop_simulation.setIcon(QIcon("./icons/stop.png"))
+        self.stop_simulation.setFixedSize(50, 50)
+        self.stop_simulation.setIconSize(QSize(40, 40))
+
 
 
         undoShortcut = QShortcut(QKeySequence('Ctrl+Z'), self)
@@ -97,7 +134,7 @@ class GraphWidget(QGraphicsView):
         # loader(self, "file")
 
         self.variableDict = {}
-        self.simulator.trigger.connect(self.costam)
+        self.simulator.trigger.connect(self.timerFun)
 
 
     def setActiveButton(self):
@@ -151,22 +188,35 @@ class GraphWidget(QGraphicsView):
             self.redoHeap.pop(-1)
 
     # def keyPressEvent(self, event):
-        # print(self.activeElement.active)
-        # self.activeElement.active = False
-        # self.activeElement.update()
-        # print("XD")
-        # self.start()
+    # print(self.activeElement.active)
+    # self.activeElement.active = False
+    # self.activeElement.update()
+    # print("XD")
+    # self.start()
 
-        # for element in self.activeElements:
-        #     print(element)
-        #     element.active = False
-        #     element.setActivated(False)
-        # key = event.key()
+    # for element in self.activeElements:
+    #     print(element)
+    #     element.active = False
+    #     element.setActivated(False)
+    # key = event.key()
 
     def showMatrix(self):
         self.matrix.combo()
         self.matrix.show()
 
+    def step_forward(self):
+        self.matrix.combo()
+        mNew = self.matrix.mNew
+
+        if mNew:
+            counter = 0
+            for key, value in self.placesDict.items():
+                print(value)
+                value.setToken(mNew[counter])
+                counter += 1
+
+        # self.matrix.show()
+        self.matrix.refresh()
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Q:
             # self.a = Matrix(self)
@@ -175,26 +225,15 @@ class GraphWidget(QGraphicsView):
 
         #one step
         if event.key() == Qt.Key_Space:
-            self.matrix.combo()
-            mNew = self.matrix.mNew
+            self.step_forward()
 
-            if mNew:
-                counter = 0
-                for key, value in self.placesDict.items():
-                    print(value)
-                    value.setToken(mNew[counter])
-                    counter += 1
-
-            # self.matrix.show()
-            self.matrix.refresh()
-
-        #start sim
-        if event.key() == Qt.Key_W:
-            self.simulator.start_simulation()
-
-        #stop sim
-        if event.key() == Qt.Key_S:
-            self.simulator.stop_simulation()
+        # #start sim
+        # if event.key() == Qt.Key_W:
+        #     self.simulator.start_simulation()
+        #
+        # #stop sim
+        # if event.key() == Qt.Key_S:
+        #     self.simulator.stop_simulation()
 
         #faster
         if event.key() == Qt.Key_D:
@@ -213,15 +252,29 @@ class GraphWidget(QGraphicsView):
     #     self.initVariables.updateVariables()
     #     self.initVariables.show()
 
-    @pyqtSlot()
-    def costam(self):
-        self.matrix.combo()
-        mNew = self.matrix.mNew
+    def start_simulationFun(self):
+        self.start_simulation_button.setChecked(True)
+        self.simulator.start_simulation()
 
-        counter = 0
-        for key, value in self.placesDict.items():
-            value.setToken(mNew[counter])
-            counter += 1
+        self.step_button.setEnabled(False)
+        self.addArcButton.setEnabled(False)
+        self.addPlaceBtn.setEnabled(False)
+        self.addTransitionBtn.setEnabled(False)
+
+    def stop_simulationFun(self):
+        self.start_simulation_button.setChecked(False)
+        self.simulator.stop_simulation()
+
+        self.step_button.setEnabled(True)
+        self.addArcButton.setEnabled(True)
+        self.addPlaceBtn.setEnabled(True)
+        self.addTransitionBtn.setEnabled(True)
+
+    @pyqtSlot()
+    def timerFun(self):
+        print("XD")
+        self.step_forward()
+
 
     def deleteItem(self, item):
         self.scene.removeItem(item)

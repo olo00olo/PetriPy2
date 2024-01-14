@@ -17,26 +17,19 @@ class Simulator(QWidget):
         layout.addWidget(self.label)
 
         self.timer = QTimer(self)
-        self.timer.timeout.connect(lambda: self.update_timer(item))
         self.time = 1000
+        self.timer.timeout.connect(lambda: self.update_timer())
 
 
 
-    # @pyqtSlot()
-    def update_timer(self, item):
-        # Ta metoda będzie wywoływana za każdym razem, gdy timer osiągnie timeout
-        current_time = int(self.label.text().split(":")[1])
-        current_time += 1
-        print(current_time)
-        self.label.setText(f"Czas: {current_time}")
+    @pyqtSlot()
+    def update_timer(self):
+        # current_time = int(self.label.text().split(":")[1])
+        # current_time += 1
         self.trigger.emit()
-        print("XDDDDDDDDDDDD")
 
 
     def start_simulation(self):
-        # self.cMatrix = Matrix.getCMatrix()
-        # print(self.cMatrix)
-        # self.timer.start(500)  # 0.5 sekundy
         self.timer.start(self.time)
 
     def stop_simulation(self):
