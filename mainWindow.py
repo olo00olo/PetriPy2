@@ -266,7 +266,8 @@ class MainWindow(QMainWindow):
     def removeLine(self, line, edit, btn):
         edit.deleteLater()
         btn.deleteLater()
-        line.setParent(None)
+        # line.setParent(None)
+        line.deleteLater()
 
     def setArcWeight(self):
         self.activeItem.setWeight(self.weightValue.text())

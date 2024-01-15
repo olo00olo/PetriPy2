@@ -19,7 +19,7 @@ def loader(graphWidget, mode):
         # filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
         # path = filename[0]
 
-        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\3.json'
+        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\12.json'
 
         convert_file = open(path, 'r')
 
@@ -41,7 +41,8 @@ def loader(graphWidget, mode):
         graphWidget.transitionsDict = {}
         graphWidget.arcsDict = {}
 
-
+        graphWidget.undoHeap = ['{"places": {}, "transitions": {}, "arcs": {}}']
+        graphWidget.redoHeap = []
 
         net = json.loads(convert_file)
 

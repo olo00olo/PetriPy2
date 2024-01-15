@@ -1,5 +1,6 @@
 from pyparsing import Word, alphas, oneOf, infixNotation, opAssoc, Literal, ParseException
 
+
 def parser(string, dict):
     if string == "":
         return 1

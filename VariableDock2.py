@@ -100,7 +100,7 @@ class VariablesDock(QDockWidget):
             for key, value in self.graphWidget.placesDict.items():
                 if a.text() in value.variables:
                     msgBox = QMessageBox()
-                    msgBox.information(self, "Information", "Variable already exists")
+                    msgBox.information(self, "Information", "Variable already exist")
                     return
 
             for key, value in self.graphWidget.transitionsDict.items():
