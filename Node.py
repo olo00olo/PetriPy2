@@ -48,7 +48,9 @@ class Node(QGraphicsItem):
 
     def boundingRect(self):
         adjust = 2.0
-        return QRectF(-10 - adjust, -10 - adjust, 23 + adjust, 23 + adjust)
+        return QRectF(-15 - adjust, -15 - adjust, 33 + adjust, 33 + adjust)
+
+        # return QRectF(-10, -10, 20, 20)  # Granice elipsy
 
     # def shape(self):
     #     path = QPainterPath()

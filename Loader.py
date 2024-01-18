@@ -19,7 +19,7 @@ def loader(graphWidget, mode):
         # filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
         # path = filename[0]
 
-        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\12.json'
+        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\13.json'
 
         convert_file = open(path, 'r')
 
@@ -40,11 +40,11 @@ def loader(graphWidget, mode):
         graphWidget.placesDict = {}
         graphWidget.transitionsDict = {}
         graphWidget.arcsDict = {}
-
-        graphWidget.undoHeap = ['{"places": {}, "transitions": {}, "arcs": {}}']
-        graphWidget.redoHeap = []
+        graphWidget.variableDict = {}
 
         net = json.loads(convert_file)
+        for key, value in net["var"].items():
+            graphWidget.variableDict.update({key: value})
 
         for key, place in net["places"].items():
             newPlace = Place(graphWidget)
@@ -73,7 +73,6 @@ def loader(graphWidget, mode):
             graphWidget.transitionsDict.update({newTransition.id: newTransition})
 
             Transition.counter = newTransition.id + 1
-
 
         for key, value in net['arcs'].items():
 
@@ -127,6 +126,7 @@ def loader(graphWidget, mode):
                     Edge.counter = newArc.id + 1
 
     except JSONDecodeError:
-        msgBox = QMessageBox()
-        msgBox.information(graphWidget, "Information", "Not proper file")
+        if mode == "file":
+            msgBox = QMessageBox()
+            msgBox.information(graphWidget, "Information", "Not proper file")
         pass

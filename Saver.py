@@ -11,7 +11,7 @@ def saver(graphWidget, mode):
     placesDict = {}
     transitionsDict = {}
     arcsDict = {}
-    all = {"places": {}, "transitions": {}, "arcs": {}}
+    all = {"places": {}, "transitions": {}, "arcs": {}, "var": {}}
 
     print(placesDict)
     for placeId, placeRef in graphWidget.placesDict.items():
@@ -52,6 +52,7 @@ def saver(graphWidget, mode):
         all["arcs"].update({i: arcsDict})
         arcsDict = {}
         i += 1
+    all["var"].update(graphWidget.variableDict)
 
     if mode == "file":
         filename = QFileDialog.getSaveFileName(graphWidget, 'Select file', '*.json')

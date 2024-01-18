@@ -47,6 +47,9 @@ class TableWindow(QDialog):
         self.table.setColumnCount(3)
         self.table.setRowCount(len(self.item.variables))
 
+        self.table.horizontalHeader().setVisible(False)
+        # self.table.verticalHeader().setVisible(False)
+
         # Wstaw dane do tabeli
         self.i = 0
 

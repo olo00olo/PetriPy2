@@ -91,16 +91,22 @@ class VariablesDock(QDockWidget):
         else:
             a = self.table_widget.cellWidget(item.row(), 0)
             b = self.table_widget.cellWidget(item.row(), 1).currentText()
-
             if a.text() == '':
                 msgBox = QMessageBox()
                 msgBox.information(self, "Information", "Change null variable first")
+                return
+
+            if a.text().islower() == 0:
+                msgBox = QMessageBox()
+                msgBox.information(self, "Information", "Variables must be lowercase")
+                a.setText(self.uVar[a][1])
                 return
 
             for key, value in self.graphWidget.placesDict.items():
                 if a.text() in value.variables:
                     msgBox = QMessageBox()
                     msgBox.information(self, "Information", "Variable already exist")
+                    a.setText(self.uVar[a][1])
                     return
 
             for key, value in self.graphWidget.transitionsDict.items():
@@ -111,16 +117,19 @@ class VariablesDock(QDockWidget):
                             if self.uVar[a] == sp[x][1:]:
                                 msgBox = QMessageBox()
                                 msgBox.information(self, "Information", "Variable connected to transition")
+                                a.setText(self.uVar[a][1])
                                 return
                         elif sp[x] == self.uVar[a]:
                             msgBox = QMessageBox()
                             msgBox.information(self, "Information", "Variable connected to transition")
+                            a.setText(self.uVar[a][1])
                             return
 
             for x in range(self.table_widget.rowCount()):
                 if self.table_widget.cellWidget(x, 0).text() == a.text() and item.row() != x:
                     msgBox = QMessageBox()
                     msgBox.information(self, "Information", "Variables duplicated")
+                    a.setText(self.uVar[a][1])
                     return
 
             if b == "True":
@@ -130,7 +139,6 @@ class VariablesDock(QDockWidget):
 
             if self.uVar[widget][1] in self.graphWidget.variableDict.keys():
                 del self.graphWidget.variableDict[self.uVar[widget][1]]
-
 
             self.uVar[a] = [self.uVar[a][0], a.text()]
 
@@ -171,7 +179,38 @@ class VariablesDock(QDockWidget):
 
     def refresh_table(self):
         for row in range(self.table_widget.rowCount()):
-            print("XDD")
             a = self.table_widget.cellWidget(row, 0).text()
-            print(row, self.table_widget.cellWidget(row, 0).text(), self.graphWidget.variableDict[a])
+            # print(row, self.table_widget.cellWidget(row, 0).text(), self.graphWidget.variableDict[a])
             self.table_widget.cellWidget(row, 1).setCurrentText(str(self.graphWidget.variableDict[a]))
+
+    def loadValue(self):
+        self.table_widget.setRowCount(0)
+        counter = 0
+        for key, value in self.graphWidget.variableDict.items():
+            self.table_widget.insertRow(counter)
+
+            item1 = QTableWidgetItem("")
+            self.table_widget.setItem(counter, 0, item1)
+            line_edit = QLineEdit(self)
+            line_edit.setText(str(key))
+            self.table_widget.setCellWidget(counter, 0, line_edit)
+            line_edit.editingFinished.connect(lambda: self.new_var(line_edit, item1))
+
+            combo_box = QComboBox(self)
+            combo_box.addItems(["False", "True"])
+            if str(value) == "False":
+                combo_box.setCurrentIndex(0)
+            else:
+                combo_box.setCurrentIndex(1)
+
+            self.table_widget.setCellWidget(counter, 1, combo_box)
+            combo_box.currentIndexChanged.connect(lambda index: self.new_var(combo_box, item1))
+
+            self.uVar.update({line_edit: [combo_box, key]})
+
+            remove_button = QPushButton("", self)
+            remove_button.setIcon(QIcon("./icons/bin.png"))
+            remove_button.clicked.connect(lambda _, row=counter: self.remove_row(row))
+            self.table_widget.setCellWidget(counter, 2, remove_button)
+
+            counter += 1

@@ -89,12 +89,28 @@ class GraphWidget(QGraphicsView):
         self.step_button.setIconSize(QSize(40, 40))
 
         self.stop_simulation = QPushButton("", self)
-        self.stop_simulation.move(305, 5)
+        self.stop_simulation.move(355, 5)
         self.stop_simulation.setCheckable(False)
         self.stop_simulation.clicked.connect(self.stop_simulationFun)
         self.stop_simulation.setIcon(QIcon("./icons/stop.png"))
         self.stop_simulation.setFixedSize(50, 50)
         self.stop_simulation.setIconSize(QSize(40, 40))
+        self.stop_simulation.setEnabled(False)
+
+        self.pause_simulation = QPushButton("", self)
+        self.pause_simulation.move(305, 5)
+        self.pause_simulation.setCheckable(False)
+        self.pause_simulation.clicked.connect(self.pause_simulationFun)
+        self.pause_simulation.setIcon(QIcon("./icons/pause.png"))
+        self.pause_simulation.setFixedSize(50, 50)
+        self.pause_simulation.setIconSize(QSize(40, 40))
+        self.pause_simulation.setEnabled(False)
+
+
+
+
+
+
 
 
 
@@ -104,7 +120,7 @@ class GraphWidget(QGraphicsView):
         redoShortcut = QShortcut(QKeySequence('Ctrl+Y'), self)
         redoShortcut.activated.connect(self.redo)
 
-        self.undoHeap = ['{"places": {}, "transitions": {}, "arcs": {}}']
+        self.undoHeap = ['{"places": {}, "transitions": {}, "arcs": {}, "var": {}']
         self.redoHeap = []
 
         self.scale(1.8, 1.8)
@@ -136,9 +152,14 @@ class GraphWidget(QGraphicsView):
         self.variableDict = {}
         self.simulator.trigger.connect(self.timerFun)
 
+        self.beforeSimNet = None
+
 
     def setActiveButton(self):
         self.n.reset()
+        if self.activeElement is not None:
+            self.activeElement.setActivated(False)
+            self.activeElement = None
         # self.deactivateAllElements()
         if self.sender() is self.addPlaceBtn and self.addPlaceBtn.isChecked():
             self.addTransitionBtn.setChecked(False)
@@ -170,9 +191,11 @@ class GraphWidget(QGraphicsView):
         saver(self, "file")
 
     def loadNet(self):
-        self.undoHeap = []
+        self.undoHeap = ['{"places": {}, "transitions": {}, "arcs": {}, "var": {}']
         self.redoHeap = []
+
         loader(self, 'file')
+
 
 
     def undo(self):
@@ -205,6 +228,10 @@ class GraphWidget(QGraphicsView):
         self.matrix.show()
 
     def step_forward(self):
+        if self.beforeSimNet is None:
+            self.beforeSimNet = saver(self, "heap")
+        self.stop_simulation.setEnabled(True)
+
         self.matrix.combo()
         mNew = self.matrix.mNew
 
@@ -224,8 +251,8 @@ class GraphWidget(QGraphicsView):
             # a.setGeometry(100, 100, 800, 600)
 
         #one step
-        if event.key() == Qt.Key_Space:
-            self.step_forward()
+        # if event.key() == Qt.Key_Space:
+        #     self.step_forward()
 
         # #start sim
         # if event.key() == Qt.Key_W:
@@ -260,6 +287,20 @@ class GraphWidget(QGraphicsView):
         self.addArcButton.setEnabled(False)
         self.addPlaceBtn.setEnabled(False)
         self.addTransitionBtn.setEnabled(False)
+        self.start_simulation_button.setEnabled(False)
+        self.stop_simulation.setEnabled(True)
+        self.pause_simulation.setEnabled(True)
+
+
+        if self.beforeSimNet is None:
+            self.beforeSimNet = saver(self, "heap")
+
+    def pause_simulationFun(self):
+        self.step_button.setEnabled(True)
+        self.start_simulation_button.setEnabled(True)
+        self.stop_simulation.setEnabled(True)
+        self.pause_simulation.setEnabled(False)
+
 
     def stop_simulationFun(self):
         self.start_simulation_button.setChecked(False)
@@ -269,12 +310,20 @@ class GraphWidget(QGraphicsView):
         self.addArcButton.setEnabled(True)
         self.addPlaceBtn.setEnabled(True)
         self.addTransitionBtn.setEnabled(True)
+        self.stop_simulation.setEnabled(False)
+        self.start_simulation_button.setEnabled(True)
+        self.pause_simulation.setEnabled(False)
+
+
+
+        loader(self, self.beforeSimNet)
+        self.beforeSimNet = None
+        self.parent.dock_variables.loadValue()
 
     @pyqtSlot()
     def timerFun(self):
-        print("XD")
-        self.step_forward()
 
+        self.step_forward()
 
     def deleteItem(self, item):
         self.scene.removeItem(item)
@@ -322,25 +371,22 @@ class GraphWidget(QGraphicsView):
                             self.activeElementChanged.emit(None)
                         self.activeElement = item
                         item.setActivated(True)
-                        # self.activeElements.append(item)
                         self.activeElementChanged.emit(item)
+
                     elif isinstance(item, (Transition, Place)) and item.active is True:
                         item.setActivated(False)
-                        # self.activeElement.active = False
                         self.activeElement = None
                         self.activeElementChanged.emit(None)
-
-
-                        # self.activeElements.remove(item)
 
                     itemClicked = 1
 
                 if itemClicked == 0:
+
                     if self.activeElement != None:
                         self.activeElement.setActivated(False)
+
                         self.activeElement = None
                         self.activeElementChanged.emit(None)
-
 
             # add place
             if self.activeState == 1:
@@ -375,10 +421,12 @@ class GraphWidget(QGraphicsView):
                     if list(value[1].values())[0] is source and list(value[2].values())[0] is destination:
                         error = 2
                         break
+                    if list(value[1].values())[0] is destination and list(value[2].values())[0] is source:
+                        error = 3
+                        break
                     # elif list(value[1].values())[0] is destination and list(value[2].values())[0] is source:
                     #     error = 2
                     #     break
-
                 if error == 0:
                     if destination is not None:
                         ne = Edge(source, destination)
@@ -397,8 +445,6 @@ class GraphWidget(QGraphicsView):
                         self.undoHeap.append(saver(self, "heap"))
                         self.redoHeap = []
 
-
-
                 elif error == 1:
                     self.n.reset()
                     msgBox = QMessageBox()
@@ -407,7 +453,12 @@ class GraphWidget(QGraphicsView):
                 elif error == 2:
                     self.n.reset()
                     msgBox = QMessageBox()
-                    msgBox.information(self, "Information", "This arc already exists")
+                    msgBox.information(self, "Information", "This arc already exist")
+
+                elif error == 3:
+                    self.n.reset()
+                    msgBox = QMessageBox()
+                    msgBox.information(self, "Information", "Can't add reversed arc")
 
         elif event.button() == Qt.MouseButton.RightButton:
             for item in items:

@@ -17,6 +17,9 @@ class TransitionVariables(QDialog):
         self.table_widget.setColumnCount(3)
         self.table_widget.setHorizontalHeaderLabels(["Column 1", "Column 2", "Remove"])
 
+        self.table_widget.horizontalHeader().setVisible(False)
+        # self.table_widget.verticalHeader().setVisible(False)
+
         add_row_button = QPushButton("Add Row", self)
         add_row_button.clicked.connect(self.add_row)
 
@@ -140,8 +143,10 @@ class TransitionVariables(QDialog):
                 remove_button.clicked.connect(lambda state, row=r: self.remove_row(row))
 
     def apply(self):
-        if self.table_widget.rowCount() == 0:
+        print(self.table_widget.rowCount())
+        if self.table_widget.rowCount() < 1:
             self.transition.setVariables("")
+            print("XD")
 
         else:
             expression = ""
@@ -172,9 +177,9 @@ class TransitionVariables(QDialog):
                         expression += "OR "
                     elif self.table_widget.cellWidget(x, 1).currentText() == "AND":
                         expression += "AND "
+
             if rows > 0:
                 expression = expression[:-1]
                 self.transition.setVariables(expression)
-
                 self.graphWidget.undoHeap.append(saver(self.graphWidget, "heap"))
                 self.graphWidget.redoHeap = []

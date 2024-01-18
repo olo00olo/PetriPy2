@@ -1,7 +1,7 @@
 import itertools
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainterPath, QRadialGradient, QColor, QBrush, QPen
+from PyQt5.QtGui import QPainterPath, QRadialGradient, QColor, QBrush, QPen, QFont
 from PyQt5.QtWidgets import QGraphicsItem, QStyle, QGraphicsTextItem
 
 from Node import Node
@@ -18,7 +18,12 @@ class Transition(Node):
         self.id = Transition.counter
         Transition.counter += 1
 
+        self.font = QFont()
+        self.font.setPointSize(12)
+
+
         self.label = QGraphicsTextItem("text", self)
+        self.label.setFont(self.font)
 
 
         self.labels()
@@ -28,6 +33,7 @@ class Transition(Node):
         self.variables = ""
         self.variablesTextItem = QGraphicsTextItem("", self)
 
+
     def setId(self, id):
         self.id = id
         self.labels()
@@ -36,11 +42,11 @@ class Transition(Node):
         text = str(self.id)
         text = "T" + text
         self.label.setPlainText(text)
-        self.label.setPos(-20, -25)
+        self.label.setPos(-30, -36)
 
     def shape(self):
         path = QPainterPath()
-        path.addRect(-10, -10, 20, 20)
+        path.addRect(-15, -15, 15, 30)
         return path
 
     def setActivated(self, bool):
@@ -64,4 +70,4 @@ class Transition(Node):
 
         painter.setBrush(QBrush(gradient))
         painter.setPen(QPen(Qt.black, 0))
-        painter.drawRect(-10, -10, 10, 20)
+        painter.drawRect(-15, -15, 15, 30)

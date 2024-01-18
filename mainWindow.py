@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
         file_menu.addAction(save_action)
 
         load_action = QAction("&Open", self)
-        load_action.triggered.connect(lambda: self.graphWidget.loadNet())
+        load_action.triggered.connect(lambda: self.loadNet())
         file_menu.addAction(load_action)
 
         view_menu = self.menuBar.addMenu("&View")
@@ -117,6 +117,9 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(self.graphWidget)
 
+        self.f1 = QFormLayout()
+        self.f2 = QFormLayout()
+
         # self.dock.setVisible(False)
         # self.dock.hide()
 
@@ -140,6 +143,11 @@ class MainWindow(QMainWindow):
         # remove_button.setIcon(QIcon("./icons/bin.png"))
 
 
+    def loadNet(self):
+        self.graphWidget.loadNet()
+        self.dock_variables.loadValue()
+
+
 
 
     def placeEditor(self):
@@ -148,6 +156,7 @@ class MainWindow(QMainWindow):
             editVariablesBtn.clicked.connect(self.openVariableTable)
 
             self.labell = QLabel()
+            # self.verticalLayout.addWidget(self.labell)
 
             onlyInt = QIntValidator()
             onlyInt.setRange(0, 9)
@@ -158,7 +167,7 @@ class MainWindow(QMainWindow):
             self.capacityValue.setText(str(self.activeItem.capacityValue))
             self.capacityValue.setValidator(onlyInt)
             self.capacityValue.editingFinished.connect(self.setPlaceCapacity)
-            self.f1 = QFormLayout()
+
             self.f1.addRow(self.capacityLabel, self.capacityValue)
 
             self.tokenLabel = QLabel()
@@ -167,9 +176,9 @@ class MainWindow(QMainWindow):
             self.tokenValue.setText(str(self.activeItem.tokens))
             self.tokenValue.setValidator(onlyInt)
             self.tokenValue.editingFinished.connect(self.setPlaceToken)
-            self.f2 = QFormLayout()
-            self.f2.addRow(self.tokenLabel, self.tokenValue)
 
+            self.f2.addRow(self.tokenLabel, self.tokenValue)
+            # self.verticalLayout.addWidget(self.labell)
             self.verticalLayout.addLayout(self.f2)
             self.verticalLayout.addLayout(self.f1)
 
@@ -177,10 +186,11 @@ class MainWindow(QMainWindow):
             self.verticalLayout.setAlignment(Qt.AlignTop)
 
 
-
         elif self.activeItem is not None and isinstance(self.activeItem, Transition):
-            editVariablesBtn = QPushButton("Edit variables", self)
+            print("XDDD")
+            self.labell = QLabel()
 
+            editVariablesBtn = QPushButton("Edit variables", self)
             editVariablesBtn.clicked.connect(self.openTransitionVariables)
 
             self.verticalLayout.addWidget(editVariablesBtn)
@@ -209,33 +219,29 @@ class MainWindow(QMainWindow):
 
 
         else:
-            try:
-                pass
-                for i in reversed(range(self.verticalLayout.count())):
-                    widget = self.verticalLayout.itemAt(i).widget()
-                    if widget is not None:
-                        widget.deleteLater()
-                for i in reversed(range(self.f1.count())):
-                    widget = self.f1.itemAt(i).widget()
-                    if widget is not None:
-                        widget.deleteLater()
-                        # widget.setParent(None)
-                for i in reversed(range(self.f2.count())):
-                    widget = self.f2.itemAt(i).widget()
-                    if widget is not None:
-                        widget.deleteLater()
-                        # widget.setParent(None)
-                #
-                self.labell = QLabel("None item selected")
-                self.verticalLayout.addWidget(self.labell)
-            except:
-                pass
+            for i in reversed(range(self.verticalLayout.count())):
+                widget = self.verticalLayout.itemAt(i).widget()
+                if widget is not None:
+                    widget.deleteLater()
+            for i in reversed(range(self.f1.count())):
+                widget = self.f1.itemAt(i).widget()
+                if widget is not None:
+                    widget.deleteLater()
+            for i in reversed(range(self.f2.count())):
+                widget = self.f2.itemAt(i).widget()
+                if widget is not None:
+                    widget.deleteLater()
+
+            self.labell.setText("None item selected")
+            self.verticalLayout.addWidget(self.labell)
 
     def openVariableTable(self):
         if isinstance(self.activeItem, Place):
             if self.activeItem.capacityValue == 1:
                 self.a = TableWindow(self.activeItem, self.graphWidget, self)
-                # a.setGeometry(100, 100, 800, 600)
+                self.a.setGeometry(100, 100, 325, 300)
+                self.a.setFixedSize(325, 300)
+                self.a.setWindowModality(Qt.ApplicationModal)
                 self.a.show()
 
             else:
@@ -243,10 +249,12 @@ class MainWindow(QMainWindow):
                 msgBox.information(self, "Information", "Can't open variable editor if capacity is greater than 0")
 
     def openTransitionVariables(self):
-
         if isinstance(self.activeItem, Transition):
 
             self.transitionVariablesWindow = TransitionVariables(self.activeItem, self.graphWidget, self)
+            self.transitionVariablesWindow.setWindowModality(Qt.ApplicationModal)
+            self.transitionVariablesWindow.setGeometry(100, 100, 325, 300)
+            self.transitionVariablesWindow.setFixedSize(325, 300)
             self.transitionVariablesWindow.show()
 
 
@@ -292,19 +300,17 @@ class MainWindow(QMainWindow):
         if a is not None and isinstance(a, Place):
             self.activeItem = a
             self.labell.setText("P" + str(a.id))
-
         elif a is not None and isinstance(a, Transition):
             self.activeItem = a
             self.labell.setText("T" + str(a.id))
-
         elif a is not None and isinstance(a, Edge):
             self.activeItem = a
             self.labell.setText("A" + str(a.id))
-
         else:
             self.activeItem = None
             self.labell.setText("None item selected")
         self.placeEditor()
+
 
     @pyqtSlot(object)
     def onJob(self, a):

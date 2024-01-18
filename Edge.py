@@ -2,7 +2,7 @@ import itertools
 import math
 
 from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QSizeF
-from PyQt5.QtGui import QPen, QPolygonF
+from PyQt5.QtGui import QPen, QPolygonF, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsTextItem
 
 
@@ -36,6 +36,16 @@ class Edge(QGraphicsItem):
 
         self.active = False
 
+    def shape(self):
+        path = QPainterPath()
+        path.moveTo(self.sourcePoint)
+        path.lineTo(self.destPoint)
+
+        # Dodaj dodatkowe miejsce wokół linii do hitboxa
+        extra_padding = 4.0
+        path.addRect(self.boundingRect().adjusted(-extra_padding, -extra_padding, extra_padding, extra_padding))
+
+        return path
 
     def setId(self, value):
         self.id = value
@@ -79,7 +89,7 @@ class Edge(QGraphicsItem):
         lenList = []
         lineList = []
 
-        l = [QPointF(-2.5, 0), QPointF(2.5, 0), QPointF(0, -2.5), QPointF(0, 2.5)]
+        l = [QPointF(-5, 0), QPointF(5, 0), QPointF(0, -5), QPointF(0, 5)]
 
         for e in l:
             for i in l:
@@ -126,14 +136,12 @@ class Edge(QGraphicsItem):
     def boundingRect(self):
         if not self.source or not self.dest:
             return QRectF()
+        pen_width = 2.0  # Dostosuj grubość obramowania
+        extra_padding = pen_width / 2.0  # Dodaj dodatkowe miejsce dla obramowania
 
-        penWidth = 1.0
-        extra = (penWidth + self.arrowSize) / 2.0
-
-        return QRectF(self.sourcePoint,
-                      QSizeF(self.destPoint.x() - self.sourcePoint.x(),
-                             self.destPoint.y() - self.sourcePoint.y())).normalized().adjusted(-extra, -extra, extra,
-                                                                                               extra)
+        return QRectF(self.sourcePoint, QSizeF(self.destPoint.x() - self.sourcePoint.x(),
+                                               self.destPoint.y() - self.sourcePoint.y())).normalized().adjusted(
+            -extra_padding, -extra_padding, extra_padding, extra_padding)
 
     # TODO: active edge highlight
     def paint(self, painter, option, widget):

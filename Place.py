@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPainterPath, QRadialGradient, QColor, QBrush, QPen
+from PyQt5.QtGui import QPainterPath, QRadialGradient, QColor, QBrush, QPen, QFont
 from PyQt5.QtWidgets import QGraphicsItem, QStyle, QGraphicsTextItem, QFormLayout, QLineEdit
 
 from Node import Node
@@ -22,7 +22,12 @@ class Place(Node):
         # self.variables = {"x": bool(1), "y": bool(0)}
         # self.variables = {"x": bool(1)}
 
+
+        self.font = QFont()
+        self.font.setPointSize(12)
+
         self.label = QGraphicsTextItem("", self)
+        self.label.setFont(self.font)
 
 
 
@@ -47,13 +52,15 @@ class Place(Node):
 
     def tokensInit(self):
         self.tokenTextItem = QGraphicsTextItem(str(self.tokens), self)
+        self.tokenTextItem.setFont(self.font)
         self.tokenTextItem.hide()
 
     def capacityInit(self):
         self.capacityTextItem = QGraphicsTextItem(str(self.capacityValue), self)
-
+        self.capacityTextItem.setFont(self.font)
         # self.capacityTextItem.setPos(-7, -5)
         self.fractionLine = QGraphicsTextItem(chr(95), self)
+        self.fractionLine.setFont(self.font)
 
     def token(self):
         self.tokenTextItem.setPlainText(str(self.tokens))
@@ -61,7 +68,7 @@ class Place(Node):
 
 
     def variablesPrint(self):
-        posOffset = 0
+        posOffset = 10
 
 
         for v in self.variablesTextItems:
@@ -92,16 +99,16 @@ class Place(Node):
 
         if self.capacityValue == 1:
             self.tokenTextItem.show()
-            self.tokenTextItem.setPos(-7, -11)
+            self.tokenTextItem.setPos(-8, -15)
 
         elif self.capacityValue > 1:
             self.fractionLine.show()
             self.capacityTextItem.show()
             self.tokenTextItem.show()
 
-            self.tokenTextItem.setPos(-7, -16)
-            self.fractionLine.setPos(-7, -16)
-            self.capacityTextItem.setPos(-7, -6)
+            self.tokenTextItem.setPos(-8, -21)
+            self.fractionLine.setPos(-8, -21)
+            self.capacityTextItem.setPos(-8, -6)
             self.capacityTextItem.setPlainText(str(self.capacityValue))
 
     def setCapacity(self, value):
@@ -128,11 +135,11 @@ class Place(Node):
         text = str(self.id)
         text = "P" + text
         self.label.setPlainText(text)
-        self.label.setPos(-20, -25)
+        self.label.setPos(-30, -36)
 
     def shape(self):
         path = QPainterPath()
-        path.addEllipse(-10, -10, 20, 20)
+        path.addEllipse(-15, -15, 30, 30)
         return path
 
     def paint(self, painter, option, widget):
@@ -149,6 +156,5 @@ class Place(Node):
 
         painter.setBrush(QBrush(gradient))
         painter.setPen(QPen(Qt.black, 0))
-        painter.drawEllipse(-10, -10, 20, 20)
-
+        painter.drawEllipse(-15, -15, 30, 30)
 
