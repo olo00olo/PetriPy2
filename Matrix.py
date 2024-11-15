@@ -15,6 +15,8 @@ class Matrix(QDialog):
     def __init__(self, item, mainWindow):
         super().__init__()
 
+        self.setWindowTitle("Matrix")
+
         self.places = []
         self.transitions = []
         self.arcs = []
@@ -227,7 +229,7 @@ class Matrix(QDialog):
                 #     self.mNew = [self.m[0] + s]
                 #     print("XDD", self.mNew)
 
-                    #todo: ustawianie zmiennych
+                    #ustawianie zmiennych
                     # for key, value in self.item.placesDict.items():
                     #     for key2, value2 in value.variables.items():
                     #         self.item.variableDict.update({key2: value2})
@@ -319,7 +321,6 @@ class Matrix(QDialog):
                             if a < 0:
                                 temp1 = 1
                         if a > self.k[y] - self.m[y] or abs(a) > self.m[y] and temp1 == 1:
-                            print(a, self.k[y], self.m[y], self.u)
                             msgBox = QMessageBox()
                             msgBox.information(self, "Information", "Solve conflict before continuation")
                             self.mNew = self.m

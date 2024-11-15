@@ -143,10 +143,8 @@ class TransitionVariables(QDialog):
                 remove_button.clicked.connect(lambda state, row=r: self.remove_row(row))
 
     def apply(self):
-        print(self.table_widget.rowCount())
         if self.table_widget.rowCount() < 1:
             self.transition.setVariables("")
-            print("XD")
 
         else:
             expression = ""

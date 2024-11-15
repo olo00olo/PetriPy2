@@ -120,6 +120,7 @@ class Place(Node):
         self.token()
 
     def addVariable(self, edit, variable):
+        pass
         print(edit, variable, "VAR")
 
     def setId(self, id):

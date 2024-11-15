@@ -35,4 +35,9 @@ class Simulator(QWidget):
     def stop_simulation(self):
         self.timer.stop()
 
+    def change_speed(self, decrement=100):
+        self.time = max(100, self.time - decrement)
+        if self.timer.isActive():
+            self.timer.start(self.time)
+
 

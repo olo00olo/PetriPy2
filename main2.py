@@ -80,7 +80,6 @@ class ASDMainWindow(QMainWindow):
     def paintEvent(self,event):
         QMainWindow.paintEvent(self, event)
         if not self.line.isNull():
-            print("XD")
             painter = QPainter(self)
             pen = QPen(Qt.red, 3)
             painter.setPen(pen)
@@ -106,7 +105,6 @@ class ASDMainWindow(QMainWindow):
         self.value.setText(value)
 
     def changeColorIfChecked(self, name):
-        print("XDDDDD")
         for place in self.button_map:
             if not place == name:
                 place.setStyleSheet("border: 3px solid dodgerblue; border-radius: 25px; background-color: white;")

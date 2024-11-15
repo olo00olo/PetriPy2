@@ -196,25 +196,29 @@ class GraphWidget(QGraphicsView):
 
         loader(self, 'file')
 
+        self.undoHeap.append(saver(self, "heap"))
+        self.redoHeap = []
+
 
 
     def undo(self):
-        if len(self.undoHeap) > 1:
-            self.redoHeap.append(self.undoHeap[-1])
-            self.undoHeap.pop(-1)
-            loader(self, self.undoHeap[-1])
+        if not self.stop_simulation.isEnabled():
+            if len(self.undoHeap) > 1:
+                self.redoHeap.append(self.undoHeap[-1])
+                self.undoHeap.pop(-1)
+                loader(self, self.undoHeap[-1])
 
     def redo(self):
-        if self.redoHeap:
-            self.undoHeap.append(self.redoHeap[-1])
-            loader(self, self.redoHeap[-1])
-            self.redoHeap.pop(-1)
+        if not self.stop_simulation.isEnabled():
+            if self.redoHeap:
+                self.undoHeap.append(self.redoHeap[-1])
+                loader(self, self.redoHeap[-1])
+                self.redoHeap.pop(-1)
 
     # def keyPressEvent(self, event):
     # print(self.activeElement.active)
     # self.activeElement.active = False
     # self.activeElement.update()
-    # print("XD")
     # self.start()
 
     # for element in self.activeElements:
@@ -238,7 +242,6 @@ class GraphWidget(QGraphicsView):
         if mNew:
             counter = 0
             for key, value in self.placesDict.items():
-                print(value)
                 value.setToken(mNew[counter])
                 counter += 1
 
@@ -250,9 +253,10 @@ class GraphWidget(QGraphicsView):
             pass
             # a.setGeometry(100, 100, 800, 600)
 
-        #one step
-        # if event.key() == Qt.Key_Space:
-        #     self.step_forward()
+        if event.key() == Qt.Key_Space:
+            pass
+            print(self.undoHeap)
+            # self.step_forward()
 
         # #start sim
         # if event.key() == Qt.Key_W:
@@ -264,11 +268,11 @@ class GraphWidget(QGraphicsView):
 
         #faster
         if event.key() == Qt.Key_D:
-            self.simulator.time += 1000
+            self.simulator.change_speed(decrement=100)
 
         #slower
         if event.key() == Qt.Key_A:
-            self.simulator.time -= 1000
+            self.simulator.change_speed(decrement=-100)
 
     #     if event.key() == Qt.Key_E:
     #         self.showVariables()
@@ -300,6 +304,9 @@ class GraphWidget(QGraphicsView):
         self.start_simulation_button.setEnabled(True)
         self.stop_simulation.setEnabled(True)
         self.pause_simulation.setEnabled(False)
+
+        self.simulator.stop_simulation()
+
 
 
     def stop_simulationFun(self):
@@ -348,6 +355,9 @@ class GraphWidget(QGraphicsView):
             (next(iter(self.arcsDict[item.id][1].values()))).outArcs.pop(item.id)
             (next(iter(self.arcsDict[item.id][2].values()))).inArcs.pop(item.id)
             self.arcsDict.pop(item.id)
+
+        self.undoHeap.append(saver(self, "heap"))
+        self.redoHeap = []
 
     # def start(self, obj):
     #
@@ -518,3 +528,15 @@ class GraphWidget(QGraphicsView):
             return
 
         self.scale(scaleFactor, scaleFactor)
+
+#TODO:
+#zmiejszyc czcionke
+#przyciski zmieniajace czas/wybor czasu
+#rysowanie lukow
+#przyklad
+#ten blad
+#w ktyorym miejscu konflikt
+#stan sieci sprzed symulacji
+#zmienna nie dziala
+#brak mozliwosc zmiany polozenia w trakcie symulacji
+#nieaktywne undo/redo w menu podczas symulacji

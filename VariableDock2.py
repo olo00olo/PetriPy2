@@ -114,12 +114,12 @@ class VariablesDock(QDockWidget):
                 for x in range(len(sp)):
                     if x % 2 == 0:
                         if sp[x][0] == "~":
-                            if self.uVar[a] == sp[x][1:]:
+                            if self.uVar[a][1] == sp[x][1:]:
                                 msgBox = QMessageBox()
                                 msgBox.information(self, "Information", "Variable connected to transition")
                                 a.setText(self.uVar[a][1])
                                 return
-                        elif sp[x] == self.uVar[a]:
+                        elif sp[x] == self.uVar[a][1]:
                             msgBox = QMessageBox()
                             msgBox.information(self, "Information", "Variable connected to transition")
                             a.setText(self.uVar[a][1])

@@ -1,6 +1,6 @@
 import itertools
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QRectF
 from PyQt5.QtGui import QPainterPath, QRadialGradient, QColor, QBrush, QPen, QFont
 from PyQt5.QtWidgets import QGraphicsItem, QStyle, QGraphicsTextItem
 
@@ -46,7 +46,7 @@ class Transition(Node):
 
     def shape(self):
         path = QPainterPath()
-        path.addRect(-15, -15, 15, 30)
+        path.addRect(-10, -10, 20, 30)
         return path
 
     def setActivated(self, bool):
@@ -58,7 +58,7 @@ class Transition(Node):
         self.variablesTextItem.setPlainText(s)
     def paint(self, painter, option, widget):
         painter.setPen(Qt.NoPen)
-        painter.drawRect(-7, -7, 20, 20)
+        painter.drawRect(-10, -10, 20, 30)
 
         gradient = QRadialGradient(-3, -3, 10)
         if option.state & QStyle.State_Sunken or self.active:
@@ -70,4 +70,4 @@ class Transition(Node):
 
         painter.setBrush(QBrush(gradient))
         painter.setPen(QPen(Qt.black, 0))
-        painter.drawRect(-15, -15, 15, 30)
+        painter.drawRect(QRectF(-7.5, -15, 15, 30))

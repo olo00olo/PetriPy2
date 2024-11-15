@@ -187,7 +187,6 @@ class MainWindow(QMainWindow):
 
 
         elif self.activeItem is not None and isinstance(self.activeItem, Transition):
-            print("XDDD")
             self.labell = QLabel()
 
             editVariablesBtn = QPushButton("Edit variables", self)
