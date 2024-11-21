@@ -150,8 +150,9 @@ class GraphWidget(QGraphicsView):
         # loader(self, "file")
 
         self.variableDict = {}
-        self.simulator.trigger.connect(self.timerFun)
+        (self.variableDict, "variableDict5")
 
+        self.simulator.trigger.connect(self.timerFun)
         self.beforeSimNet = None
 
 
@@ -236,7 +237,9 @@ class GraphWidget(QGraphicsView):
             self.beforeSimNet = saver(self, "heap")
         self.stop_simulation.setEnabled(True)
 
+
         self.matrix.combo()
+
         mNew = self.matrix.mNew
 
         if mNew:
@@ -329,8 +332,12 @@ class GraphWidget(QGraphicsView):
 
     @pyqtSlot()
     def timerFun(self):
-
+        print(self.variableDict, "variableDict6")
         self.step_forward()
+
+
+        print(self.variableDict, "variableDict7")
+
 
     def deleteItem(self, item):
         self.scene.removeItem(item)
@@ -534,8 +541,8 @@ class GraphWidget(QGraphicsView):
 #przyciski zmieniajace czas/wybor czasu
 #rysowanie lukow
 #przyklad
-#ten blad
-#w ktyorym miejscu konflikt
+#ten blad v
+#w ktyorym miejscu konflikt v
 #stan sieci sprzed symulacji
 #zmienna nie dziala
 #brak mozliwosc zmiany polozenia w trakcie symulacji

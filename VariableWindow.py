@@ -26,8 +26,13 @@ class TableWindow(QDialog):
     def init_combo_box_options(self):
         varList = []
 
+        print(self.m.graphWidget.variableDict, "variableDict42")
+
         for key, value in self.m.variableDict.items():
+            print("1")
             varList.append(key)
+        print(self.m.graphWidget.variableDict, "variableDict43")
+
 
         combo_box2_options = [""]
         combo_box2_options.extend(varList)
@@ -103,10 +108,14 @@ class TableWindow(QDialog):
         item.setBackground(QColor(255, 0, 0))
 
     def add_row(self):
+        print(self.m.graphWidget.variableDict, "variableDict44")
+
         if len(self.m.variableDict) == 0:
             msgBox = QMessageBox()
             msgBox.information(self, "Information", "No variable available")
             return
+        print(self.m.graphWidget.variableDict, "variableDict45")
+
 
         current_row_count = self.table.rowCount()
         self.table.setRowCount(current_row_count + 1)

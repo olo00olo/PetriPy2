@@ -126,10 +126,10 @@ class VariablesDock(QDockWidget):
 
             self.uVar.update({a: a.text()})
 
-        print(self.graphWidget.variableDict, "1111111111111")
+        print(self.graphWidget.variableDict, "variableDict36")
         self.varDict.update(self.varDict)
         self.graphWidget.variableDict.update(self.varDict)
-        print(self.graphWidget.variableDict, "2222222222222")
+        print(self.graphWidget.variableDict, "variableDict37")
 
 
 
@@ -171,7 +171,10 @@ class VariablesDock(QDockWidget):
             self.varDict.pop(temp)
 
         self.table_widget.removeRow(row)
+        print(self.graphWidget.variableDict, "variableDict38")
+
         self.graphWidget.variableDict = self.varDict
+        print(self.graphWidget.variableDict, "variableDict39")
 
         for r in range(self.table_widget.rowCount() - 1, -1, -1):
             remove_button = self.table_widget.cellWidget(r, 2)
@@ -226,6 +229,9 @@ class VariablesDock(QDockWidget):
 
     def refresh_values(self):
         self.table_widget.setRowCount(0)
+        print(self.graphWidget.variableDict, "variableDict40")
 
         self.varDict = self.graphWidget.variableDict
+        print(self.graphWidget.variableDict, "variableDict41")
+
         self.populate_table()

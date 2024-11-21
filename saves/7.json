@@ -1,0 +1,1 @@
+{"places": {"1": {"id": 1, "pos": [218.33, 101.67], "tokens": 0, "capacity": 1, "variables": {}}}, "transitions": {"1": {"id": 1, "pos": [153.89, 83.33], "var": ""}, "2": {"id": 2, "pos": [146.11, 134.44], "var": ""}}, "arcs": {"1": {"T": 1, "P": 1, "weight": 1, "id": 1}, "2": {"T": 2, "P": 1, "weight": 1, "id": 2}}, "var": {}}

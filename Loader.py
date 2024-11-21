@@ -16,10 +16,10 @@ def loader(graphWidget, mode):
     maxArcId = 0
     if mode == "file":
 
-        filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
-        path = filename[0]
+        # filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
+        # path = filename[0]
 
-        # path = r'C:\Users\olo00\PycharmProjects\PetriPy2\saves\2.json'
+        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\saves\7.json'
         convert_file = open(path, 'r')
 
         convert_file = convert_file.read()
@@ -39,11 +39,19 @@ def loader(graphWidget, mode):
         graphWidget.placesDict = {}
         graphWidget.transitionsDict = {}
         graphWidget.arcsDict = {}
+
+        print(graphWidget.variableDict, "variableDict1")
         graphWidget.variableDict = {}
+        print(graphWidget.variableDict, "variableDict2")
+
+
 
         net = json.loads(convert_file)
         for key, value in net["var"].items():
+            print(graphWidget.variableDict, "variableDict3")
+
             graphWidget.variableDict.update({key: value})
+            print(graphWidget.variableDict, "variableDict4")
 
         for key, place in net["places"].items():
             newPlace = Place(graphWidget)

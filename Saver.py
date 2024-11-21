@@ -51,7 +51,11 @@ def saver(graphWidget, mode):
         all["arcs"].update({i: arcsDict})
         arcsDict = {}
         i += 1
+    print(graphWidget.variableDict, "variableDict18")
+
     all["var"].update(graphWidget.variableDict)
+    print(graphWidget.variableDict, "variableDict19")
+
 
     if mode == "file":
         filename = QFileDialog.getSaveFileName(graphWidget, 'Select file', '*.json')

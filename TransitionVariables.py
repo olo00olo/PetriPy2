@@ -72,9 +72,11 @@ class TransitionVariables(QDialog):
         varList = []
         # for key, value in self.graphWidget.placesDict.items():
         #     varList.extend(list(value.variables.keys()))
+        print(self.graphWidget.variableDict, "variableDict20")
+
         for key, value in self.graphWidget.variableDict.items():
             varList.append(key)
-
+        print(self.graphWidget.variableDict, "variableDict21")
 
         combo_box1_options = ["", "~"]
         self.combo_box1_options = combo_box1_options

@@ -124,6 +124,8 @@ class Edge(QGraphicsItem):
             edgeOffset = QPointF((line.dx() * 10) / length,
                                  (line.dy() * 10) / length)
 
+            # edgeOffset = QPointF(100)
+            print(edgeOffset, type(edgeOffset))
             self.sourcePoint = line.p1() + edgeOffset
             self.destPoint = line.p2() - edgeOffset
 

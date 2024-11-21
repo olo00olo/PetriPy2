@@ -49,7 +49,11 @@ class Matrix(QDialog):
         self.initValue()
         self.matrixMK()
         self.matrixC()
+
         self.matrixU()
+
+
+
 
     def initValue(self):
         self.places = []
@@ -158,7 +162,10 @@ class Matrix(QDialog):
                 if self.c[0] < 0 and u + uCap + uVar == 3:
                     for key, value in self.item.placesDict.items():
                         for key2, value2 in value.variables.items():
+                            print(self.item.variableDict, "variableDict8")
+
                             self.item.variableDict.update({key2: value2})
+                            print(self.item.variableDict, "variableDict9")
 
                     self.mainWindow.dock_variables.refresh_table()
 
@@ -202,14 +209,40 @@ class Matrix(QDialog):
                 #     msgBox.information(self, "Information", "Conflict")
 
                 a = 0
+                temp1 = 0
                 for x in range(len(self.c)):
                     a += self.u[x] * self.c[x][0]
-                if a > self.k[0] - self.m[0] or abs(a) > self.m[0]:
+                    if a < 0:
+                        temp1 = 1
+                if abs(a) > self.m[0] and temp1 == 1:
+                    print(a, self.m, self.m[0])
+                    outArcs = list(self.item.placesDict.values())[0].outArcs
+                    info = ""
+                    for key, value in enumerate(outArcs.values()):
+                        prefix = "T"
+                        info += f"{prefix}{list(value[2])[0]} "
+
                     msgBox = QMessageBox()
-                    msgBox.information(self, "Information", "Solve conflict before continuation")
+                    msgBox.information(self, "Information", "Solve conflict in " + info + "before continuation")
                     self.mNew = self.m
                     self.item.stop_simulationFun()
                     return
+
+                if a > self.k[0] - self.m[0]:
+                    inArcs = list(self.item.placesDict.values())[0].inArcs
+                    print(inArcs, "AAA")
+                    info = ""
+                    for key, value in enumerate(inArcs.values()):
+                        prefix = "T"
+                        info += f"{prefix}{list(value[1])[0]} "
+
+                    msgBox = QMessageBox()
+                    msgBox.information(self, "Information", "Solve conflict in " + info + "before continuation")
+                    self.mNew = self.m
+                    self.item.stop_simulationFun()
+                    return
+                temp1 = 0
+                a = 0
 
                 self.mNew = list(np.add(self.m, np.matmul(self.u, self.c)))
 
@@ -218,7 +251,10 @@ class Matrix(QDialog):
                     if self.u[x] == 1 and self.c[x][0] < 0:
                         for key, value in self.item.placesDict.items():
                             for key2, value2 in value.variables.items():
+                                print(self.item.variableDict, "variableDict10")
+
                                 self.item.variableDict.update({key2: value2})
+                                print(self.item.variableDict, "variableDict11")
 
                         self.mainWindow.dock_variables.refresh_table()
                 # if sum == len(self.c) and sum2 == len(self.c) and sum3 == len(self.c):
@@ -278,7 +314,10 @@ class Matrix(QDialog):
 
                     for key, value in self.item.placesDict.items():
                         for key2, value2 in value.variables.items():
+                            print(self.item.variableDict, "variableDict12")
+
                             self.item.variableDict.update({key2: value2})
+                            print(self.item.variableDict, "variableDict13")
 
                     self.mainWindow.dock_variables.refresh_table()
 
@@ -320,12 +359,32 @@ class Matrix(QDialog):
                             a += self.u[x] * self.c[x][y]
                             if a < 0:
                                 temp1 = 1
-                        if a > self.k[y] - self.m[y] or abs(a) > self.m[y] and temp1 == 1:
+                        if abs(a) > self.m[y] and temp1 == 1:
+                            outArcs = list(self.item.placesDict.values())[y].outArcs
+                            info = ""
+                            for key, value in enumerate(outArcs.values()):
+                                prefix = "T"
+                                info += f"{prefix}{list(value[2])[0]} "
+
                             msgBox = QMessageBox()
-                            msgBox.information(self, "Information", "Solve conflict before continuation")
+                            msgBox.information(self, "Information", "Solve conflict in " + info + "before continuation")
                             self.mNew = self.m
                             self.item.stop_simulationFun()
                             return
+
+                        if a > self.k[y] - self.m[y]:
+                            inArcs = list(self.item.placesDict.values())[y].inArcs
+                            info = ""
+                            for key, value in enumerate(inArcs.values()):
+                                prefix = "T"
+                                info += f"{prefix}{list(value[1])[0]} "
+
+                            msgBox = QMessageBox()
+                            msgBox.information(self, "Information", "Solve conflict in " + info + "before continuation")
+                            self.mNew = self.m
+                            self.item.stop_simulationFun()
+                            return
+
                         temp1 = 0
                         a = 0
 
@@ -338,7 +397,11 @@ class Matrix(QDialog):
                                     for key, value in self.item.placesDict.items():
                                         if counter == col:
                                             for key2, value2 in value.variables.items():
+                                                print(self.item.variableDict, "variableDict14")
+
                                                 self.item.variableDict.update({key2: value2})
+                                                print(self.item.variableDict, "variableDict15")
+
                                         counter += 1
                                     self.mainWindow.dock_variables.refresh_table()
 
@@ -393,7 +456,12 @@ class Matrix(QDialog):
         varC = []
         for key, value in self.item.transitionsDict.items():
             if value.variables != "":
+                print(self.item.variableDict, "variableDict16")
+
                 a = parser(value.variables, self.item.variableDict)
+
+                print(self.item.variableDict, "variableDict17")
+
                 varC.append(int(a))
             else:
                 varC.append(1)

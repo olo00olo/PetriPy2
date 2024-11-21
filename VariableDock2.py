@@ -84,9 +84,17 @@ class VariablesDock(QDockWidget):
 
             else:
                 if widget.currentText() == "True":
+                    print(self.graphWidget.variableDict, "variableDict22")
+
                     self.graphWidget.variableDict.update({k: True})
+                    print(self.graphWidget.variableDict, "variableDict23")
+
                 else:
+                    print(self.graphWidget.variableDict, "variableDict24")
+
                     self.graphWidget.variableDict.update({k: False})
+                    print(self.graphWidget.variableDict, "variableDict25")
+
 
         else:
             a = self.table_widget.cellWidget(item.row(), 0)
@@ -133,12 +141,23 @@ class VariablesDock(QDockWidget):
                     return
 
             if b == "True":
-                self.graphWidget.variableDict.update({a.text(): True})
-            else:
-                self.graphWidget.variableDict.update({a.text(): False})
+                print(self.graphWidget.variableDict, "variableDict26")
 
-            if self.uVar[widget][1] in self.graphWidget.variableDict.keys():
-                del self.graphWidget.variableDict[self.uVar[widget][1]]
+                self.graphWidget.variableDict.update({a.text(): True})
+                print(self.graphWidget.variableDict, "variableDict27")
+
+            else:
+                print(self.graphWidget.variableDict, "variableDict28")
+
+                self.graphWidget.variableDict.update({a.text(): False})
+                print(self.graphWidget.variableDict, "variableDict29")
+
+            #bez tego dziala, ale dlaczego????????
+            # if self.uVar[widget][1] in self.graphWidget.variableDict.keys():
+            #     print(self.graphWidget.variableDict, "variableDict30")
+            #
+            #     del self.graphWidget.variableDict[self.uVar[widget][1]]
+            #     print(self.graphWidget.variableDict, "variableDict31")
 
             self.uVar[a] = [self.uVar[a][0], a.text()]
 
@@ -167,8 +186,11 @@ class VariablesDock(QDockWidget):
 
         self.table_widget.removeRow(row)
 
+        print(self.graphWidget.variableDict, "variableDict32")
+
         if temp in self.graphWidget.variableDict.keys():
             self.graphWidget.variableDict.pop(temp)
+        print(self.graphWidget.variableDict, "variableDict33")
 
         for r in range(self.table_widget.rowCount() - 1, -1, -1):
             remove_button = self.table_widget.cellWidget(r, 2)
@@ -181,13 +203,26 @@ class VariablesDock(QDockWidget):
         for row in range(self.table_widget.rowCount()):
             a = self.table_widget.cellWidget(row, 0).text()
             # print(row, self.table_widget.cellWidget(row, 0).text(), self.graphWidget.variableDict[a])
+            # print("asdhafjf")
+
+            # print(a)
+            # print("asdhafjf1")
+            # print(self.graphWidget.variableDict)
+            # print("asdhafjf2")
+
+            # print(self.graphWidget.variableDict[a])
+            # print("asdhafjf3")
+            #TODO: odkomentowac:
             self.table_widget.cellWidget(row, 1).setCurrentText(str(self.graphWidget.variableDict[a]))
 
     def loadValue(self):
         self.table_widget.setRowCount(0)
         counter = 0
+        print(self.graphWidget.variableDict, "variableDict34")
+
         for key, value in self.graphWidget.variableDict.items():
             self.table_widget.insertRow(counter)
+            print(self.graphWidget.variableDict, "variableDict35")
 
             item1 = QTableWidgetItem("")
             self.table_widget.setItem(counter, 0, item1)

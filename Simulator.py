@@ -20,6 +20,8 @@ class Simulator(QWidget):
         self.time = 1000
         self.timer.timeout.connect(lambda: self.update_timer())
 
+        self.item = item
+
 
 
     @pyqtSlot()
