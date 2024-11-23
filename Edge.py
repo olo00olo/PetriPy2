@@ -5,6 +5,8 @@ from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QSizeF
 from PyQt5.QtGui import QPen, QPolygonF, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsTextItem
 
+from Transition import Transition
+
 
 class Edge(QGraphicsItem):
     Pi = math.pi
@@ -89,7 +91,11 @@ class Edge(QGraphicsItem):
         lenList = []
         lineList = []
 
-        l = [QPointF(-5, 0), QPointF(5, 0), QPointF(0, -5), QPointF(0, 5)]
+        if isinstance(self.dest, Transition):
+            l = [QPointF(-0, 0), QPointF(0, 0), QPointF(0, -5), QPointF(0, 5)]
+        else:
+            l = [QPointF(-5, 0), QPointF(5, 0), QPointF(0, -5), QPointF(0, 5)]
+
 
         for e in l:
             for i in l:
@@ -124,8 +130,6 @@ class Edge(QGraphicsItem):
             edgeOffset = QPointF((line.dx() * 10) / length,
                                  (line.dy() * 10) / length)
 
-            # edgeOffset = QPointF(100)
-            print(edgeOffset, type(edgeOffset))
             self.sourcePoint = line.p1() + edgeOffset
             self.destPoint = line.p2() - edgeOffset
 

@@ -257,8 +257,11 @@ class GraphWidget(QGraphicsView):
             # a.setGeometry(100, 100, 800, 600)
 
         if event.key() == Qt.Key_Space:
-            pass
-            print(self.undoHeap)
+            self.activeElement.setActivated(False)
+            self.activeElement = None
+            self.activeElementChanged.emit(None)
+
+
             # self.step_forward()
 
         # #start sim
@@ -297,6 +300,11 @@ class GraphWidget(QGraphicsView):
         self.start_simulation_button.setEnabled(False)
         self.stop_simulation.setEnabled(True)
         self.pause_simulation.setEnabled(True)
+
+        if self.activeElement is not None:
+            self.activeElement.setActivated(False)
+            self.activeElement = None
+            self.activeElementChanged.emit(None)
 
 
         if self.beforeSimNet is None:
@@ -376,7 +384,7 @@ class GraphWidget(QGraphicsView):
     def mousePressEvent(self, event):
         items = self.items(event.pos())
 
-        if event.button() == Qt.MouseButton.LeftButton:
+        if event.button() == Qt.MouseButton.LeftButton and  self.start_simulation_button.isEnabled():
             # default state
             if self.activeState == 0:
                 itemClicked = 0
@@ -511,7 +519,7 @@ class GraphWidget(QGraphicsView):
             self.panStartY = event.y()
             event.accept()
         items = self.items(event.pos())
-        if items and isinstance(items[0], QGraphicsItem):
+        if items and isinstance(items[0], QGraphicsItem) and  self.start_simulation_button.isEnabled():
             QGraphicsView.mouseMoveEvent(self, event)
             return
 
