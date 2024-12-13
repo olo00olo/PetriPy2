@@ -239,13 +239,16 @@ class MainWindow(QMainWindow):
             if self.activeItem.capacityValue == 1:
                 self.a = TableWindow(self.activeItem, self.graphWidget, self)
                 self.a.setGeometry(100, 100, 325, 300)
+                print("XD")
                 self.a.setFixedSize(325, 300)
                 self.a.setWindowModality(Qt.ApplicationModal)
+                print("XD1")
                 self.a.show()
 
             else:
                 msgBox = QMessageBox()
                 msgBox.information(self, "Information", "Can't open variable editor if capacity is greater than 0")
+
 
     def openTransitionVariables(self):
         if isinstance(self.activeItem, Transition):

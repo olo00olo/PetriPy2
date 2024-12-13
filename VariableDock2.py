@@ -84,16 +84,12 @@ class VariablesDock(QDockWidget):
 
             else:
                 if widget.currentText() == "True":
-                    print(self.graphWidget.variableDict, "variableDict22")
 
                     self.graphWidget.variableDict.update({k: True})
-                    print(self.graphWidget.variableDict, "variableDict23")
 
                 else:
-                    print(self.graphWidget.variableDict, "variableDict24")
 
                     self.graphWidget.variableDict.update({k: False})
-                    print(self.graphWidget.variableDict, "variableDict25")
 
 
         else:
@@ -141,16 +137,12 @@ class VariablesDock(QDockWidget):
                     return
 
             if b == "True":
-                print(self.graphWidget.variableDict, "variableDict26")
 
                 self.graphWidget.variableDict.update({a.text(): True})
-                print(self.graphWidget.variableDict, "variableDict27")
 
             else:
-                print(self.graphWidget.variableDict, "variableDict28")
 
                 self.graphWidget.variableDict.update({a.text(): False})
-                print(self.graphWidget.variableDict, "variableDict29")
 
             #bez tego dziala, ale dlaczego????????
             # if self.uVar[widget][1] in self.graphWidget.variableDict.keys():
@@ -186,11 +178,9 @@ class VariablesDock(QDockWidget):
 
         self.table_widget.removeRow(row)
 
-        print(self.graphWidget.variableDict, "variableDict32")
 
         if temp in self.graphWidget.variableDict.keys():
             self.graphWidget.variableDict.pop(temp)
-        print(self.graphWidget.variableDict, "variableDict33")
 
         for r in range(self.table_widget.rowCount() - 1, -1, -1):
             remove_button = self.table_widget.cellWidget(r, 2)
@@ -212,17 +202,14 @@ class VariablesDock(QDockWidget):
 
             # print(self.graphWidget.variableDict[a])
             # print("asdhafjf3")
-            #TODO: odkomentowac:
             self.table_widget.cellWidget(row, 1).setCurrentText(str(self.graphWidget.variableDict[a]))
 
     def loadValue(self):
         self.table_widget.setRowCount(0)
         counter = 0
-        print(self.graphWidget.variableDict, "variableDict34")
 
         for key, value in self.graphWidget.variableDict.items():
             self.table_widget.insertRow(counter)
-            print(self.graphWidget.variableDict, "variableDict35")
 
             item1 = QTableWidgetItem("")
             self.table_widget.setItem(counter, 0, item1)

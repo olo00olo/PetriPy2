@@ -3,7 +3,7 @@ import math
 from PyQt5.QtCore import (QRectF, Qt, pyqtSignal, pyqtSlot, QSize)
 from PyQt5.QtGui import (QPainter, QKeySequence, QIcon)
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsScene,
-                             QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QShortcut)
+                             QGraphicsView, QPushButton, QMessageBox, QMenu, QAction, QShortcut, QComboBox)
 
 from Edge import Edge
 from Loader import loader
@@ -47,7 +47,6 @@ class GraphWidget(QGraphicsView):
         self.addPlaceBtn.setIcon(QIcon("./icons/circle.png"))
         self.addPlaceBtn.setFixedSize(50, 50)
         self.addPlaceBtn.setIconSize(QSize(40, 40))
-
 
         self.addTransitionBtn = QPushButton("", self)
         self.addTransitionBtn.move(55, 5)
@@ -105,6 +104,14 @@ class GraphWidget(QGraphicsView):
         self.pause_simulation.setFixedSize(50, 50)
         self.pause_simulation.setIconSize(QSize(40, 40))
         self.pause_simulation.setEnabled(False)
+
+        self.time_pick = QComboBox(self)
+        self.time_pick.addItems(["500 ms", "1000 ms", "1500 ms", "2000 ms"])
+        self.time_pick.move(405, 5)
+        self.time_pick.currentTextChanged.connect(self.change_timer_interval)
+
+
+
 
 
 
@@ -316,6 +323,7 @@ class GraphWidget(QGraphicsView):
         self.stop_simulation.setEnabled(True)
         self.pause_simulation.setEnabled(False)
 
+
         self.simulator.stop_simulation()
 
 
@@ -338,14 +346,13 @@ class GraphWidget(QGraphicsView):
         self.beforeSimNet = None
         self.parent.dock_variables.loadValue()
 
+    def change_timer_interval(self, text):
+        interval = int(text.split()[0])
+        self.simulator.change_timer_interval(interval)
+
     @pyqtSlot()
     def timerFun(self):
-        print(self.variableDict, "variableDict6")
         self.step_forward()
-
-
-        print(self.variableDict, "variableDict7")
-
 
     def deleteItem(self, item):
         self.scene.removeItem(item)
@@ -545,13 +552,12 @@ class GraphWidget(QGraphicsView):
         self.scale(scaleFactor, scaleFactor)
 
 #TODO:
-#zmiejszyc czcionke
-#przyciski zmieniajace czas/wybor czasu
-#rysowanie lukow
-#przyklad
+#przyciski zmieniajace czas/wybor czasu v
+#rysowanie lukow v
+#przyklad v
 #ten blad v
 #w ktyorym miejscu konflikt v
-#stan sieci sprzed symulacji
-#zmienna nie dziala
-#brak mozliwosc zmiany polozenia w trakcie symulacji
-#nieaktywne undo/redo w menu podczas symulacji
+#stan sieci sprzed symulacji v
+#zmienna nie dziala v
+#brak mozliwosc zmiany polozenia w trakcie symulacji v
+#nieaktywne undo/redo w menu podczas symulacji v

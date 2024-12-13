@@ -16,10 +16,10 @@ def loader(graphWidget, mode):
     maxArcId = 0
     if mode == "file":
 
-        # filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
-        # path = filename[0]
+        filename = QFileDialog.getOpenFileName(graphWidget, 'Select file', '*.json')
+        path = filename[0]
 
-        path = r'C:\Users\olo00\PycharmProjects\PetriPy2\saves\8.json'
+        # path = r'C:\Users\olo00\PycharmProjects\PetriPy2\saves\1.json'
         convert_file = open(path, 'r')
 
         convert_file = convert_file.read()

@@ -42,4 +42,6 @@ class Simulator(QWidget):
         if self.timer.isActive():
             self.timer.start(self.time)
 
-
+    def change_timer_interval(self, interval):
+        self.timer.setInterval(interval)
+        print(interval)
